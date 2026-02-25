@@ -12,8 +12,6 @@ export const AuthProvider = ({ children }) => {
             const token = localStorage.getItem('token');
             if (token) {
                 try {
-                    // Ideally verify token with backend, for now decode or trust if consistent
-                    // We can persist user info in localStorage or fetch profile
                     const storedUser = JSON.parse(localStorage.getItem('user'));
                     if (storedUser) {
                         setUser(storedUser);

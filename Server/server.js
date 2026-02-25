@@ -33,20 +33,41 @@ app.get("/", (req, res) => {
 });
 
 // 🔹 Test insert function (temporary verification)
+const bcrypt = require("bcryptjs"); // Import bcrypt for hashing
+
+// 🔹 Test insert function (temporary verification)
 const testInsert = async () => {
   try {
-    const existingUser = await User.findOne({ email: "test@example.com" });
+    const email = "test@example.com";
+    const password = "123456";
+
+    const existingUser = await User.findOne({ email });
 
     if (!existingUser) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
       const user = await User.create({
         name: "Test User",
-        email: "test@example.com",
-        password: "123456"
+        email,
+        password: hashedPassword,
+        role: "student"
       });
 
-      console.log("Test user inserted:", user.email);
+      console.log("Test user created:", user.email);
     } else {
-      console.log("Test user already exists");
+      // Check if password is valid (hashed)
+      const isMatch = await bcrypt.compare(password, existingUser.password);
+      if (!isMatch) {
+        console.log("Updating test user password to be hashed...");
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+        existingUser.password = hashedPassword;
+        await existingUser.save();
+        console.log("Test user password updated.");
+      } else {
+        console.log("Test user already exists and password is valid.");
+      }
     }
   } catch (error) {
     console.error("Error inserting test user:", error.message);

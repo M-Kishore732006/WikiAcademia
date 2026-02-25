@@ -71,7 +71,7 @@ const Register = () => {
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">I am a...</label>
                         <select
-                            className="input-field bg-white"
+                            className="input-field"
                             value={role}
                             onChange={(e) => setRole(e.target.value)}
                         >

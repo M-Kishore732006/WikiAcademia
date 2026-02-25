@@ -1,9 +1,11 @@
 :root {
   /* Soft Color Palette */
-  --primary: #4F46E5;
-  /* Indigo-600 */
-  --primary-hover: #4338CA;
-  /* Indigo-700 */
+  --primary: #007bff;
+  /* Smurf Blue */
+  --primary-hover: #0056b3;
+  /* Darker Blue */
+  --primary-gradient: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
+  --primary-gradient-hover: linear-gradient(135deg, #005bb5 0%, #0baae6 100%);
   --secondary: #64748B;
   /* Slate-500 */
   --background: #F8FAFC;
@@ -44,10 +46,10 @@
 }
 
 [data-theme='dark'] {
-  --primary: #6366f1;
-  /* Indigo-500 */
-  --primary-hover: #818cf8;
-  /* Indigo-400 */
+  --primary: #00c6ff;
+  /* Sky Blue */
+  --primary-hover: #0072ff;
+  /* Smurf Blue */
   --secondary: #94a3b8;
   /* Slate-400 */
   --background: #0f172a;
@@ -130,12 +132,14 @@ p {
 }
 
 .btn-primary {
-  background-color: var(--primary);
+  background: var(--primary-gradient);
   color: white;
+  border-color: transparent;
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-hover);
+  background: var(--primary-gradient-hover);
+  border-color: transparent;
 }
 
 .btn-outline {
@@ -328,6 +332,14 @@ p {
   color: var(--primary);
 }
 
+.text-gradient {
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
 .text-secondary {
   color: var(--secondary);
 }
@@ -338,6 +350,14 @@ p {
 
 .mt-4 {
   margin-top: var(--space-4);
+}
+
+.mt-8 {
+  margin-top: var(--space-8);
+}
+
+.mt-12 {
+  margin-top: 3rem;
 }
 
 .mb-8 {
@@ -465,8 +485,9 @@ p {
   background-color: #dcfce7;
 }
 
-.bg-purple-100 {
-  background-color: #f3e8ff;
+.bg-primary-gradient {
+  background: var(--primary-gradient);
+  color: white;
 }
 
 .text-success {

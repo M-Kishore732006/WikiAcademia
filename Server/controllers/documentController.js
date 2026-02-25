@@ -2,14 +2,6 @@ const Document = require("../models/Document");
 const mongoose = require("mongoose");
 const upload = require("../config/gridfs");
 
-// Initialize GridFS Stream
-let bucket;
-mongoose.connection.once("open", () => {
-    bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
-        bucketName: "uploads"
-    });
-});
-
 // @desc    Upload a document (PDF or Link)
 // @route   POST /api/documents
 // @access  Private (Faculty Only)
@@ -32,8 +24,8 @@ const uploadDocument = async (req, res) => {
             if (!req.file) {
                 return res.status(400).json({ message: "Please upload a PDF file" });
             }
-            // Store filename for GridFS retrieval
-            fileUrl = req.file.filename;
+            // Store Cloudinary secure_url for retrieval
+            fileUrl = req.file.path;
         } else if (materialType === "Link") {
             if (!linkUrl) {
                 return res.status(400).json({ message: "Please provide a valid link" });
@@ -120,33 +112,11 @@ const downloadDocument = async (req, res) => {
             await document.save();
 
             if (document.materialType === "Link") {
-                // If expecting redirect, do redirect, or return JSON?
-                // Depending on frontend. But usually download endpoint initiates download.
-                // Since this is creating a blob on frontend, redirect might break blob?
-                // But frontend handles it. 
-                // Let's just send the link back or redirect if direct access.
-                // However, for blob, we can't redirect.
-                // Let's return the URL in JSON if requested via API, or redirect if via browser.
-                // Current frontend expects blob stream.
-                // Let's just send the text content of URL? No.
                 return res.json({ url: document.linkUrl });
             }
 
-            // Stream from GridFS
-            if (!bucket) {
-                return res.status(500).json({ message: "GridFS not initialized" });
-            }
-
-            const downloadStream = bucket.openDownloadStreamByName(document.fileUrl);
-
-            downloadStream.on("error", (err) => {
-                return res.status(404).json({ message: "File not found" });
-            });
-
-            res.set("Content-Type", "application/pdf");
-            res.set("Content-Disposition", `attachment; filename="${document.title}.pdf"`);
-
-            downloadStream.pipe(res);
+            // Return Cloudinary URL
+            return res.json({ url: document.fileUrl });
         } else {
             res.status(404).json({ message: "Document not found" });
         }

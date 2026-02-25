@@ -31,17 +31,23 @@ const Browse = () => {
         fetchDocuments();
     }, [selectedCategory]);
 
-    const handleDownload = async (id, title) => {
+    const handleDownload = async (id, title, materialType, linkUrl) => {
+        if (materialType === 'Link') {
+            window.open(linkUrl, '_blank', 'noopener,noreferrer');
+            return;
+        }
+
         try {
-            const response = await api.get(`/documents/${id}/download`, {
-                responseType: 'blob',
-            });
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', `${title}.pdf`);
-            document.body.appendChild(link);
-            link.click();
+            const response = await api.get(`/documents/${id}/download`);
+            const url = response.data.url;
+
+            // Cloudinary returns a secure URL. Since it's a PDF, 
+            // opening it in a new tab will let the browser's PDF viewer handle it.
+            if (url) {
+                window.open(url, '_blank', 'noopener,noreferrer');
+            } else {
+                console.error("No URL returned for download");
+            }
         } catch (error) {
             console.error("Download failed", error);
         }

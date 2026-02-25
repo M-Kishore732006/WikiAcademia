@@ -12,7 +12,7 @@ const Home = () => {
             {/* Hero Section */}
             <section className="bg-surface py-20 border-b border-gray-200">
                 <div className="container text-center">
-                    <h1 className="text-4xl md:text-6xl font-extrabold text-primary mb-6">
+                    <h1 className="text-4xl md:text-6xl font-extrabold text-gradient mb-6">
                         Digital Academic Knowledge Repository
                     </h1>
                     <p className="text-xl text-secondary mb-8 max-w-2xl mx-auto">
@@ -66,7 +66,7 @@ const Home = () => {
 
                         {/* Feature 3 */}
                         <div className="card text-center hover:shadow-lg transition-shadow">
-                            <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
+                            <div className="bg-primary-gradient w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-white">
                                 <Upload size={32} />
                             </div>
                             <h3 className="text-xl font-bold mb-2">Faculty Uploads</h3>
