@@ -1,10 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { Trash2, Edit2, X } from 'lucide-react';
 import api from '../utils/api';
+import AuthContext from '../context/AuthContext';
 
 const Browse = () => {
     const [documents, setDocuments] = useState([]);
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
+    const { user } = useContext(AuthContext);
+
+    const [editingDoc, setEditingDoc] = useState(null);
+    const [editFormData, setEditFormData] = useState({
+        title: '',
+        description: '',
+        department: '',
+        subject: '',
+        semester: '',
+        linkUrl: ''
+    });
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -37,19 +50,47 @@ const Browse = () => {
             return;
         }
 
-        try {
-            const response = await api.get(`/documents/${id}/download`);
-            const url = response.data.url;
+        // Directly open the backend download proxy URL in a new tab
+        const token = localStorage.getItem('token');
+        // If your backend protects the route, you might need to pass the token in a query param 
+        //, but currently GET /documents/:id/download is Public in documentRoutes.js
+        window.open(`http://localhost:5000/api/documents/${id}/download`, '_blank', 'noopener,noreferrer');
+    };
 
-            // Cloudinary returns a secure URL. Since it's a PDF, 
-            // opening it in a new tab will let the browser's PDF viewer handle it.
-            if (url) {
-                window.open(url, '_blank', 'noopener,noreferrer');
-            } else {
-                console.error("No URL returned for download");
+    const handleDelete = async (id) => {
+        if (window.confirm("Are you sure you want to delete this material? This cannot be undone.")) {
+            try {
+                await api.delete(`/documents/${id}`);
+                setDocuments(documents.filter(doc => doc._id !== id));
+            } catch (error) {
+                console.error("Delete failed", error);
+                alert("Failed to delete the material.");
             }
+        }
+    };
+
+    const handleEditClick = (doc) => {
+        setEditingDoc(doc._id);
+        setEditFormData({
+            title: doc.title || '',
+            description: doc.description || '',
+            department: doc.department || '',
+            subject: doc.subject || '',
+            semester: doc.semester || '',
+            linkUrl: doc.linkUrl || ''
+        });
+    };
+
+    const handleUpdateSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const { data } = await api.put(`/documents/${editingDoc}`, editFormData);
+            setDocuments(documents.map(doc => doc._id === editingDoc ? { ...doc, ...data } : doc));
+            setEditingDoc(null);
+            alert("Document updated successfully");
         } catch (error) {
-            console.error("Download failed", error);
+            console.error("Update failed", error);
+            alert("Failed to update document.");
         }
     };
 
@@ -76,43 +117,105 @@ const Browse = () => {
                 {documents.map(doc => (
                     <div key={doc._id} className="card bg-surface flex flex-col h-full hover:shadow-lg transition-shadow">
                         <div className="flex-1">
-                            <div className="flex justify-between items-start mb-2">
-                                <h3 className="text-lg font-bold text-gray-800 line-clamp-2">{doc.title}</h3>
-                                <span className={`text-xs px-2 py-1 rounded-full ${doc.materialType === 'Link' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'}`}>
-                                    {doc.materialType || 'PDF'}
+                            <div className="flex justify-between items-start mb-2 gap-3">
+                                <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 line-clamp-2 pr-2">{doc.title}</h3>
+                                <span className={`text-xs px-6 pt-1 pb-1.5 rounded-full whitespace-nowrap shrink-0 font-medium ${doc.materialType === 'Link' ? 'bg-blue-100 text-blue-800 dark:text-blue-900' : 'bg-red-100 text-red-800 dark:text-red-900'}`}>
+                                    {doc.materialType === 'Link' ? 'Link' : (doc.fileUrl ? doc.fileUrl.split('.').pop().toUpperCase() : 'PDF')}
                                 </span>
                             </div>
                             <p className="text-secondary text-sm mb-4 line-clamp-3">{doc.description}</p>
 
                             <div className="space-y-1 mb-4">
-                                <div className="text-xs text-gray-500 flex items-center gap-1">
+                                <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                                     <span className="font-semibold">Subject:</span> {doc.subject || 'N/A'}
                                 </div>
-                                <div className="text-xs text-gray-500 flex items-center gap-1">
-                                    <span className="font-semibold">Dept:</span> {doc.department || 'General'}
+                                <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                    <span className="font-semibold">Dept:</span> {doc.department || 'N/A'}
                                 </div>
-                                <div className="text-xs text-gray-500 flex items-center gap-1">
+                                <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                                     <span className="font-semibold">Sem:</span> {doc.semester || 'N/A'}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                            <small className="text-gray-400 text-xs">By {doc.uploadedBy?.name || 'Unknown'}</small>
-                            <button
-                                onClick={() => handleDownload(doc._id, doc.title, doc.materialType, doc.linkUrl)}
-                                className="btn btn-primary text-sm px-4 py-2"
-                            >
-                                {doc.materialType === 'Link' ? 'Open Link' : 'Download'}
-                            </button>
+                        <div className="mt-4 pt-5 border-t border-gray-100 flex justify-between items-end">
+                            <small className="text-gray-400 dark:text-gray-500 text-xs mb-1">By {doc.uploadedBy?.name || 'Unknown'}</small>
+                            <div className="flex gap-2 items-center mt-2">
+                                {user && (user._id === doc.uploadedBy?._id || user.role === 'admin') && (
+                                    <>
+                                        <button
+                                            onClick={() => handleEditClick(doc)}
+                                            className="btn-icon bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700"
+                                            title="Edit Material"
+                                        >
+                                            <Edit2 size={18} />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(doc._id)}
+                                            className="btn-icon bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700"
+                                            title="Delete Material"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </>
+                                )}
+                                <button
+                                    onClick={() => handleDownload(doc._id, doc.title, doc.materialType, doc.linkUrl)}
+                                    className="btn btn-primary text-sm px-4 py-2 whitespace-nowrap"
+                                >
+                                    {doc.materialType === 'Link' ? 'Open Link' : 'Download'}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ))}
             </div>
 
             {documents.length === 0 && (
-                <div className="text-center py-20 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                    <p className="text-gray-500 text-lg">No documents found matching your criteria.</p>
+                <div className="text-center py-20 bg-gray-50 dark:bg-gray-800 rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
+                    <p className="text-gray-500 dark:text-gray-400 text-lg">No documents found matching your criteria.</p>
+                </div>
+            )}
+
+            {editingDoc && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-surface rounded-xl max-w-lg w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Edit Document</h2>
+                            <button onClick={() => setEditingDoc(null)} className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <form onSubmit={handleUpdateSubmit} className="flex flex-col gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-secondary mb-1">Title</label>
+                                <input type="text" className="input-field" value={editFormData.title} onChange={e => setEditFormData({ ...editFormData, title: e.target.value })} required />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-secondary mb-1">Description</label>
+                                <textarea className="input-field" rows="2" value={editFormData.description} onChange={e => setEditFormData({ ...editFormData, description: e.target.value })} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-secondary mb-1">Department</label>
+                                    <input type="text" className="input-field" value={editFormData.department} onChange={e => setEditFormData({ ...editFormData, department: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-secondary mb-1">Semester</label>
+                                    <input type="text" className="input-field" value={editFormData.semester} onChange={e => setEditFormData({ ...editFormData, semester: e.target.value })} />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-secondary mb-1">Subject</label>
+                                <input type="text" className="input-field" value={editFormData.subject} onChange={e => setEditFormData({ ...editFormData, subject: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-secondary mb-1">Link URL (optional)</label>
+                                <input type="text" className="input-field" value={editFormData.linkUrl} onChange={e => setEditFormData({ ...editFormData, linkUrl: e.target.value })} />
+                            </div>
+                            <button type="submit" className="btn btn-primary mt-2 py-2">Save Changes</button>
+                        </form>
+                    </div>
                 </div>
             )}
         </div>

@@ -29,7 +29,7 @@ const Register = () => {
                 {error && <div className="bg-red-100 border border-red-500 text-red-700 p-3 rounded mb-4 text-sm">{error}</div>}
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Full Name</label>
                         <input
                             type="text"
                             placeholder="John Doe"
@@ -40,7 +40,7 @@ const Register = () => {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Email Address</label>
                         <input
                             type="email"
                             placeholder="john@example.com"
@@ -51,7 +51,7 @@ const Register = () => {
                         />
                     </div>
                     <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Password</label>
                         <input
                             type={showPassword ? "text" : "password"}
                             placeholder="Create a password"
@@ -62,14 +62,14 @@ const Register = () => {
                         />
                         <button
                             type="button"
-                            className="absolute right-3 top-[32px] text-gray-500 hover:text-primary bg-transparent border-none cursor-pointer"
+                            className="absolute right-3 top-[32px] text-gray-500 dark:text-gray-400 hover:text-primary bg-transparent border-none cursor-pointer"
                             onClick={() => setShowPassword(!showPassword)}
                         >
                             {showPassword ? "Hide" : "Show"}
                         </button>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">I am a...</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">I am a...</label>
                         <select
                             className="input-field"
                             value={role}
@@ -77,6 +77,7 @@ const Register = () => {
                         >
                             <option value="student">Student</option>
                             <option value="faculty">Faculty</option>
+                            <option value="admin">Admin</option>
                         </select>
                     </div>
 

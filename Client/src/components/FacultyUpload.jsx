@@ -9,7 +9,7 @@ const FacultyUpload = () => {
     const [subject, setSubject] = useState('');
     const [semester, setSemester] = useState('');
     const [category, setCategory] = useState('');
-    const [materialType, setMaterialType] = useState('PDF');
+    const [materialType, setMaterialType] = useState('File');
     const [linkUrl, setLinkUrl] = useState('');
     const [file, setFile] = useState(null);
     const [message, setMessage] = useState('');
@@ -35,7 +35,7 @@ const FacultyUpload = () => {
         e.preventDefault();
         setMessage('');
 
-        if (materialType === 'PDF' && !file) {
+        if (materialType === 'File' && !file) {
             setMessage('Please select a file');
             return;
         }
@@ -98,7 +98,9 @@ const FacultyUpload = () => {
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                        <label className="block text-sm font-medium text-secondary mb-1">Title</label>
+                        <label className="block text-sm font-medium text-secondary mb-1">
+                            Title <span className="text-red-500 dark:text-red-400">*</span>
+                        </label>
                         <input
                             type="text"
                             placeholder="e.g. Advanced Calculus Notes"
@@ -109,7 +111,9 @@ const FacultyUpload = () => {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-secondary mb-1">Category</label>
+                        <label className="block text-sm font-medium text-secondary mb-1">
+                            Category <span className="text-red-500 dark:text-red-400">*</span>
+                        </label>
                         <input
                             type="text"
                             list="category-suggestions"
@@ -147,7 +151,6 @@ const FacultyUpload = () => {
                             className="input-field"
                             value={department}
                             onChange={(e) => setDepartment(e.target.value)}
-                            required
                         />
                     </div>
                     <div>
@@ -158,7 +161,6 @@ const FacultyUpload = () => {
                             className="input-field"
                             value={subject}
                             onChange={(e) => setSubject(e.target.value)}
-                            required
                         />
                     </div>
                     <div>
@@ -169,25 +171,26 @@ const FacultyUpload = () => {
                             className="input-field"
                             value={semester}
                             onChange={(e) => setSemester(e.target.value)}
-                            required
                         />
                     </div>
                 </div>
 
                 <div className="p-4 bg-background rounded-lg border border-border">
-                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-3">Upload Type</label>
+                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-3">
+                        Upload Type <span className="text-red-500 dark:text-red-400">*</span>
+                    </label>
                     <div className="flex gap-4 mb-4">
-                        <label className={`flex items-center gap-2 cursor-pointer p-2 rounded border ${materialType === 'PDF' ? 'border-primary bg-primary/5 text-primary' : 'border-border'}`}>
+                        <label className={`flex items-center gap-2 cursor-pointer p-2 rounded border ${materialType === 'File' ? 'border-primary bg-primary/5 text-primary' : 'border-border'}`}>
                             <input
                                 type="radio"
                                 name="homeMaterialType"
-                                value="PDF"
-                                checked={materialType === 'PDF'}
+                                value="File"
+                                checked={materialType === 'File'}
                                 onChange={(e) => setMaterialType(e.target.value)}
                                 className="hidden"
                             />
                             <FileText size={18} />
-                            <span>PDF Document</span>
+                            <span>Document File</span>
                         </label>
                         <label className={`flex items-center gap-2 cursor-pointer p-2 rounded border ${materialType === 'Link' ? 'border-primary bg-primary/5 text-primary' : 'border-border'}`}>
                             <input
@@ -203,33 +206,36 @@ const FacultyUpload = () => {
                         </label>
                     </div>
 
-                    {materialType === 'PDF' ? (
-                        <div>
+                    {
+                        materialType === 'File' ? (
+                            <div>
+                                <input
+                                    type="file"
+                                    accept=".pdf,.odf,.ppt,.pptx"
+                                    className="input-field"
+                                    onChange={handleFileChange}
+                                    required
+                                />
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Supported formats: PDF, ODF, PPT, PPTX.</p>
+                            </div>
+                        ) : (
                             <input
-                                type="file"
-                                accept=".pdf"
+                                type="url"
+                                placeholder="https://..."
                                 className="input-field"
-                                onChange={handleFileChange}
+                                value={linkUrl}
+                                onChange={(e) => setLinkUrl(e.target.value)}
                                 required
                             />
-                        </div>
-                    ) : (
-                        <input
-                            type="url"
-                            placeholder="https://..."
-                            className="input-field"
-                            value={linkUrl}
-                            onChange={(e) => setLinkUrl(e.target.value)}
-                            required
-                        />
-                    )}
-                </div>
+                        )
+                    }
+                </div >
 
                 <button type="submit" className="btn btn-primary w-full py-3 text-lg font-bold shadow-md hover:shadow-lg transform transition-all active:scale-95">
                     Upload & Publish
                 </button>
-            </form>
-        </div>
+            </form >
+        </div >
     );
 };
 

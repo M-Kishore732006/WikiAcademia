@@ -27,7 +27,7 @@ const Login = () => {
                 {error && <div className="bg-red-100 border border-red-500 text-red-700 p-3 rounded mb-4 text-sm">{error}</div>}
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Email Address</label>
                         <input
                             type="email"
                             placeholder="Enter your email"
@@ -38,7 +38,7 @@ const Login = () => {
                         />
                     </div>
                     <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Password</label>
                         <input
                             type={showPassword ? "text" : "password"}
                             placeholder="Enter your password"
@@ -49,7 +49,7 @@ const Login = () => {
                         />
                         <button
                             type="button"
-                            className="absolute right-3 top-[32px] text-gray-500 hover:text-primary bg-transparent border-none cursor-pointer"
+                            className="absolute right-3 top-[32px] text-gray-500 dark:text-gray-400 hover:text-primary bg-transparent border-none cursor-pointer"
                             onClick={() => setShowPassword(!showPassword)}
                         >
                             {showPassword ? "Hide" : "Show"}

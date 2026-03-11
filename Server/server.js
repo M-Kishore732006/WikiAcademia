@@ -8,18 +8,28 @@ const cors = require("cors");
 require("dotenv").config();
 
 const path = require("path");
+const fs = require("fs");
 const connectDB = require("./config/db");
 const User = require("./models/user");
 const authRoutes = require("./routes/authRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const documentRoutes = require("./routes/documentRoutes");
+const helmet = require("helmet");
+const morgan = require("morgan");
 
 // 🔹 Create Express app
 const app = express();
 
 // 🔹 Middleware
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
+
+// 🔹 Setup logging
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
+app.use(morgan('combined', { stream: accessLogStream }));
+app.use(morgan('dev')); // Also log to console
+
 // app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/auth", authRoutes);

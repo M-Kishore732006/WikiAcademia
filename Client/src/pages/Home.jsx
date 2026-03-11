@@ -29,8 +29,8 @@ const Home = () => {
                         )}
                     </div>
 
-                    {/* Faculty Upload Section - Visible only to Faculty */}
-                    {user && user.role === 'faculty' && (
+                    {/* Faculty Upload Section - Visible only to Faculty and Admin */}
+                    {user && (user.role === 'faculty' || user.role === 'admin') && (
                         <div className="mt-12 animate-fade-in">
                             <FacultyUpload />
                         </div>

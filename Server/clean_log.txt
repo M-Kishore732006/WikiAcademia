@@ -1,0 +1,103 @@
+﻿[dotenv@17.3.1] injecting env (6) from .env -- tip: ≡ƒ¢á∩╕Å  run anywhere with `dotenvx run -- yourcommand`
+cmd : node:internal/mod
+ules/cjs/loader:1451
+At line:1 char:1
++ cmd /c node 
+server.js > log.txt 
+2>&1
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (node:internal   
+ /modules/cjs/loade    
+r:1451:String) [],     
+RemoteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+  throw err;
+  ^
+
+Error: Cannot find 
+module 'multer-storage-
+cloudinary'
+Require stack:
+- D:\Projects\Web Proje
+cts\DigitalAcademicRepo
+sitory\Server\config\gr
+idfs.js
+- D:\Projects\Web Proje
+cts\DigitalAcademicRepo
+sitory\Server\controlle
+rs\documentController.j
+s
+- D:\Projects\Web Proje
+cts\DigitalAcademicRepo
+sitory\Server\routes\do
+cumentRoutes.js
+- D:\Projects\Web Proje
+cts\DigitalAcademicRepo
+sitory\Server\server.js
+    at Module._resolveF
+ilename (node:internal/
+modules/cjs/loader:1448
+:15)
+    at 
+defaultResolveImpl (nod
+e:internal/modules/cjs/
+loader:1059:19)
+    at 
+resolveForCJSWithHooks 
+(node:internal/modules/
+cjs/loader:1064:22)
+    at Module._load (no
+de:internal/modules/cjs
+/loader:1234:25)
+    at TracingChannel.t
+raceSync (node:diagnost
+ics_channel:328:14)
+    at wrapModuleLoad (
+node:internal/modules/c
+js/loader:245:24)
+    at Module.require (
+node:internal/modules/c
+js/loader:1548:12)
+    at require (node:in
+ternal/modules/helpers:
+152:16)
+    at 
+Object.<anonymous> 
+(D:\Projects\Web Projec
+ts\DigitalAcademicRepos
+itory\Server\config\gri
+dfs.js:2:31)
+    at Module._compile 
+(node:internal/modules/
+cjs/loader:1804:14) {
+  code: 
+'MODULE_NOT_FOUND',
+  requireStack: [
+    'D:\\Projects\\Web 
+Projects\\DigitalAcadem
+icRepository\\Server\\c
+onfig\\gridfs.js',
+    'D:\\Projects\\Web 
+Projects\\DigitalAcadem
+icRepository\\Server\\c
+ontrollers\\documentCon
+troller.js',
+    'D:\\Projects\\Web 
+Projects\\DigitalAcadem
+icRepository\\Server\\r
+outes\\documentRoutes.j
+s',
+    'D:\\Projects\\Web 
+Projects\\DigitalAcadem
+icRepository\\Server\\s
+erver.js'
+  ]
+}
+
+Node.js v24.13.1

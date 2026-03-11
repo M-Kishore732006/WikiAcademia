@@ -14,24 +14,34 @@ cloudinary.config({
 // Create Cloudinary storage engine
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
-    params: {
-        folder: 'academic_documents',
-        format: async (req, file) => 'pdf', // supports promises as well
-        // public_id: (req, file) => 'computed-filename-using-request',
+    params: async (req, file) => {
+        // Extract the original extension and base name
+        const ext = path.extname(file.originalname);
+        const name = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9]/g, '_');
+
+        return {
+            folder: 'academic_documents',
+            resource_type: 'raw', // Important for handling non-standard image/video formats properly (like PDF, PPT)
+            // Explicitly appending the extension to public_id is required for 'raw' files
+            public_id: `${name}_${Date.now()}${ext}`
+        };
     },
 });
 
 const upload = multer({
     storage,
+    limits: {
+        fileSize: 10 * 1024 * 1024 // 10 MB limit
+    },
     fileFilter: (req, file, cb) => {
-        const filetypes = /pdf/;
+        const filetypes = /pdf|odf|ppt|pptx/;
         const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-        const mimetype = filetypes.test(file.mimetype);
 
-        if (extname && mimetype) {
+        // Mimetypes for these can be tricky, so checking extname is usually safer alongside a loose mimetype check
+        if (extname) {
             cb(null, true);
         } else {
-            cb(new Error("Error: PDFs Only!"));
+            cb(new Error("Error: Unsupported file format! Please upload PDF, ODF, PPT, or PPTX."));
         }
     }
 });

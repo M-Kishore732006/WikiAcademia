@@ -25,7 +25,7 @@ const Navbar = () => {
 
                 {/* Mobile Menu Button */}
                 <button
-                    className="md:hidden text-gray-600 bg-transparent border-none cursor-pointer"
+                    className="md:hidden text-gray-600 dark:text-gray-300 bg-transparent border-none cursor-pointer"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
                     {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -35,7 +35,7 @@ const Navbar = () => {
                 <div className="hidden md:flex items-center gap-6">
                     <button
                         onClick={toggleTheme}
-                        className="bg-transparent border-none cursor-pointer text-gray-500 hover:text-primary transition-colors flex items-center justify-center p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="bg-transparent border-none cursor-pointer text-gray-500 dark:text-gray-400 hover:text-primary transition-colors flex items-center justify-center p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
                         title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
                     >
                         {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
@@ -44,7 +44,7 @@ const Navbar = () => {
                     <Link to="/browse" className="nav-link">Browse Materials</Link>
                     {user ? (
                         <>
-                            {user.role === 'faculty' && (
+                            {(user.role === 'faculty' || user.role === 'admin') && (
                                 <Link to="/dashboard" className="btn btn-primary text-white text-sm py-2 px-4 no-underline flex items-center gap-2">
                                     <Upload size={16} /> Dashboard
                                 </Link>
@@ -55,7 +55,7 @@ const Navbar = () => {
                             </div>
                             <button
                                 onClick={handleLogout}
-                                className="text-gray-500 hover:text-red-700 bg-transparent border-none cursor-pointer flex items-center gap-1"
+                                className="text-gray-500 dark:text-gray-400 hover:text-red-700 dark:hover:text-red-500 bg-transparent border-none cursor-pointer flex items-center gap-1"
                                 title="Logout"
                             >
                                 <LogOut size={20} />
@@ -85,11 +85,11 @@ const Navbar = () => {
                     <Link to="/browse" className="nav-link" onClick={() => setIsMenuOpen(false)}>Browse Materials</Link>
                     {user ? (
                         <>
-                            {user.role === 'faculty' && (
+                            {(user.role === 'faculty' || user.role === 'admin') && (
                                 <Link to="/dashboard" className="nav-link" onClick={() => setIsMenuOpen(false)}>Dashboard</Link>
                             )}
                             <div className="border-t pt-2 mt-2">
-                                <p className="text-sm text-gray-500 mb-2">Signed in as {user.name}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Signed in as {user.name}</p>
                                 <button
                                     onClick={() => { handleLogout(); setIsMenuOpen(false); }}
                                     className="text-red-500 w-full text-left"

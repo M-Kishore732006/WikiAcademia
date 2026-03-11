@@ -11,21 +11,18 @@ const documentSchema = new mongoose.Schema(
       type: String
     },
     department: {
-      type: String,
-      required: true
+      type: String
     },
     subject: {
-      type: String,
-      required: true
+      type: String
     },
     semester: {
-      type: String,
-      required: true
+      type: String
     },
     materialType: {
       type: String,
-      enum: ["PDF", "Link"],
-      default: "PDF"
+      enum: ["File", "Link"],
+      default: "File"
     },
     fileUrl: {
       type: String
