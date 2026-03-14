@@ -74,7 +74,7 @@ const uploadDocument = async (req, res) => {
 // @access  Public
 const getDocuments = async (req, res) => {
     try {
-        const { department, semester, subject, search, category } = req.query;
+        const { department, semester, subject, search, category, sort } = req.query;
 
         let query = {};
 
@@ -86,14 +86,27 @@ const getDocuments = async (req, res) => {
         if (search) {
             query.$or = [
                 { title: { $regex: search, $options: "i" } },
-                { subject: { $regex: search, $options: "i" } }
+                { subject: { $regex: search, $options: "i" } },
+                { description: { $regex: search, $options: "i" } },
+                { semester: { $regex: search, $options: "i" } }
             ];
         }
 
+        let sortOption = { createdAt: -1 }; // Default: Newest first
+        
+        if (sort === 'oldest') {
+            sortOption = { createdAt: 1 };
+        } else if (sort === 'a-z') {
+            sortOption = { title: 1 };
+        } else if (sort === 'z-a') {
+            sortOption = { title: -1 };
+        }
+
         const documents = await Document.find(query)
+            .collation({ locale: "en", strength: 2 }) // Ensure case-insensitive alphabetical sorting
             .populate("uploadedBy", "name")
             .populate("category", "name") // Populate category
-            .sort({ createdAt: -1 });
+            .sort(sortOption);
 
         res.json(documents);
     } catch (error) {
@@ -147,7 +160,13 @@ const downloadDocument = async (req, res) => {
                 response.data.pipe(res);
             } catch (streamError) {
                 console.error("Error streaming from Cloudinary via axios:", streamError);
-                return res.status(500).json({ message: "Failed to fetch document from cloud storage." });
+                require('fs').appendFileSync('log.txt', new Date().toISOString() + ' - ' + streamError.message + '\n' + (streamError.response ? JSON.stringify(streamError.response.headers) : '') + '\n');
+                return res.status(500).json({ 
+                    message: "Failed to fetch document from cloud storage.", 
+                    error: streamError.message, 
+                    code: streamError.code,
+                    url: document.fileUrl
+                });
             }
 
         } else {

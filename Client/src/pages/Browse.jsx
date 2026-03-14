@@ -7,6 +7,9 @@ const Browse = () => {
     const [documents, setDocuments] = useState([]);
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [sortBy, setSortBy] = useState('newest'); // 'newest', 'oldest', 'a-z', 'z-a'
+    const [showSortMenu, setShowSortMenu] = useState(false);
     const { user } = useContext(AuthContext);
 
     const [editingDoc, setEditingDoc] = useState(null);
@@ -34,15 +37,41 @@ const Browse = () => {
     useEffect(() => {
         const fetchDocuments = async () => {
             try {
-                const query = selectedCategory ? `?category=${selectedCategory}` : '';
-                const { data } = await api.get(`/documents${query}`);
-                setDocuments(data);
+                let queryStr = `?sort=${sortBy}`;
+                if (selectedCategory) {
+                    queryStr += `&category=${selectedCategory}`;
+                }
+                if (searchQuery) {
+                    queryStr += `&search=${encodeURIComponent(searchQuery)}`;
+                }
+                const { data } = await api.get(`/documents${queryStr}`);
+                
+                // Aggressive Client-Side Fallback Sort to guarantee immediate UI updates
+                const sortedData = [...data].sort((a, b) => {
+                    if (sortBy === 'a-z') return a.title.localeCompare(b.title, undefined, { sensitivity: 'base' });
+                    if (sortBy === 'z-a') return b.title.localeCompare(a.title, undefined, { sensitivity: 'base' });
+                    if (sortBy === 'oldest') return new Date(a.createdAt) - new Date(b.createdAt);
+                    return new Date(b.createdAt) - new Date(a.createdAt); // newest
+                });
+
+                setDocuments(sortedData);
             } catch (error) {
                 console.error("Failed to fetch documents");
             }
         };
         fetchDocuments();
-    }, [selectedCategory]);
+    }, [selectedCategory, sortBy, searchQuery]);
+
+    // Close sort menu when clicking outside (simple approach for now)
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (showSortMenu && !e.target.closest('.sort-container')) {
+                setShowSortMenu(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showSortMenu]);
 
     const handleDownload = async (id, title, materialType, linkUrl) => {
         if (materialType === 'Link') {
@@ -94,22 +123,109 @@ const Browse = () => {
         }
     };
 
+    const getSortLabel = () => {
+        switch(sortBy) {
+            case 'newest': return 'Newest First';
+            case 'oldest': return 'Oldest First';
+            case 'a-z': return 'A to Z';
+            case 'z-a': return 'Z to A';
+            default: return 'Sort';
+        }
+    };
+
     return (
         <div className="container py-8" style={{ minHeight: '60vh' }}>
-            <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                <h1 className="text-2xl font-bold text-primary mb-0">Study Materials</h1>
-                <div className="w-full md:w-auto">
-                    <select
-                        className="input-field"
-                        style={{ minWidth: '250px' }}
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                    >
-                        <option value="">All Categories</option>
-                        {categories.map(cat => (
-                            <option key={cat._id} value={cat._id}>{cat.name}</option>
-                        ))}
-                    </select>
+            <div className="flex flex-wrap items-center justify-between mb-8 gap-4">
+                <h1 className="text-2xl font-bold text-primary m-0 whitespace-nowrap">Study Materials</h1>
+                
+                {/* Unified Horizontal Container for All Controls */}
+                <div className="flex flex-wrap items-center gap-3">
+                    
+                    {/* Search Bar */}
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                        <svg 
+                            style={{ position: 'absolute', left: '12px', color: '#9ca3af', pointerEvents: 'none' }} 
+                            width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                        >
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input
+                            type="text"
+                            placeholder="Search materials..."
+                            className="input-field"
+                            style={{ minWidth: '220px', paddingLeft: '36px' }}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+
+                    {/* Category Dropdown */}
+                    <div>
+                        <select
+                            className="input-field"
+                            style={{ minWidth: '180px' }}
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                        >
+                            <option value="">All Categories</option>
+                            {categories.map(cat => (
+                                <option key={cat._id} value={cat._id}>{cat.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                            
+                    {/* Sort Container */}
+                    <div className="relative shrink-0 sort-container" style={{ position: 'relative' }}>
+                        <button 
+                            className="btn-icon bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 flex items-center justify-center p-2 rounded-lg transition-colors border border-gray-200 dark:border-gray-600 shadow-sm"
+                            onClick={() => setShowSortMenu(!showSortMenu)}
+                            title={`Current Sort: ${getSortLabel()}`}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M3 6h7" />
+                                <path d="M5 10h3" />
+                                <path d="M6 14h1" />
+                                <path d="M14 6l3 -3l3 3" />
+                                <path d="M17 3v18" />
+                                <path d="M20 18l-3 3l-3 -3" />
+                            </svg>
+                        </button>
+                        
+                        {showSortMenu && (
+                            <div 
+                                className="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700"
+                                style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, width: '192px', zIndex: 9999 }}
+                            >
+                                <div className="py-2">
+                                    <button 
+                                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${sortBy === 'newest' ? 'bg-blue-50 text-blue-600 font-medium dark:bg-blue-900/30 dark:text-blue-400' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                                        onClick={() => { setSortBy('newest'); setShowSortMenu(false); }}
+                                    >
+                                        Date: Newest First
+                                    </button>
+                                    <button 
+                                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${sortBy === 'oldest' ? 'bg-blue-50 text-blue-600 font-medium dark:bg-blue-900/30 dark:text-blue-400' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                                        onClick={() => { setSortBy('oldest'); setShowSortMenu(false); }}
+                                    >
+                                        Date: Oldest First
+                                    </button>
+                                    <button 
+                                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${sortBy === 'a-z' ? 'bg-blue-50 text-blue-600 font-medium dark:bg-blue-900/30 dark:text-blue-400' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                                        onClick={() => { setSortBy('a-z'); setShowSortMenu(false); }}
+                                    >
+                                        Alphabetical: A-Z
+                                    </button>
+                                    <button 
+                                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${sortBy === 'z-a' ? 'bg-blue-50 text-blue-600 font-medium dark:bg-blue-900/30 dark:text-blue-400' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                                        onClick={() => { setSortBy('z-a'); setShowSortMenu(false); }}
+                                    >
+                                        Alphabetical: Z-A
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
