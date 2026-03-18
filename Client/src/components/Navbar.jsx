@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, BookOpen, LogOut, User, Upload, Moon, Sun } from 'lucide-react';
+import { Menu, X, BookOpen, LogOut, User, Upload, Moon, Sun, Users } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
 import ThemeContext from '../context/ThemeContext';
 
@@ -49,6 +49,11 @@ const Navbar = () => {
                                     <Upload size={16} /> Dashboard
                                 </Link>
                             )}
+                            {user.role === 'admin' && (
+                                <Link to="/manage-users" className="btn btn-outline text-sm py-2 px-4 no-underline flex items-center gap-2">
+                                    <Users size={16} /> Manage Users
+                                </Link>
+                            )}
                             <div className="flex items-center gap-2 text-secondary">
                                 <User size={18} />
                                 <span className="font-medium">{user.name}</span>
@@ -87,6 +92,9 @@ const Navbar = () => {
                         <>
                             {(user.role === 'faculty' || user.role === 'admin') && (
                                 <Link to="/dashboard" className="nav-link" onClick={() => setIsMenuOpen(false)}>Dashboard</Link>
+                            )}
+                            {user.role === 'admin' && (
+                                <Link to="/manage-users" className="nav-link" onClick={() => setIsMenuOpen(false)}>Manage Users</Link>
                             )}
                             <div className="border-t pt-2 mt-2">
                                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Signed in as {user.name}</p>

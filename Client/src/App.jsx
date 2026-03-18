@@ -10,6 +10,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Browse from './pages/Browse';
+import ManageUsers from './pages/ManageUsers';
+import FacultyUploads from './pages/FacultyUploads';
 import './App.css';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -40,6 +42,22 @@ function App() {
                   element={
                     <ProtectedRoute allowedRoles={['faculty', 'admin']}>
                       <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/manage-users"
+                  element={
+                    <ProtectedRoute allowedRoles={['admin']}>
+                      <ManageUsers />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/manage-users/:id/uploads"
+                  element={
+                    <ProtectedRoute allowedRoles={['admin']}>
+                      <FacultyUploads />
                     </ProtectedRoute>
                   }
                 />

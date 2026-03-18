@@ -7,7 +7,7 @@ const upload = require("../config/gridfs");
 // @access  Private (Faculty Only)
 const uploadDocument = async (req, res) => {
     try {
-        const {
+        let {
             title,
             description,
             department,
@@ -17,6 +17,8 @@ const uploadDocument = async (req, res) => {
             linkUrl,
             category // Can be ID or Name
         } = req.body;
+
+        if (title) title = title.replace(/\s+/g, ' ').trim();
 
         let fileUrl = "";
 
@@ -92,6 +94,29 @@ const getDocuments = async (req, res) => {
             ];
         }
 
+        const { uploadedBy } = req.query;
+        if (uploadedBy) {
+            let isAdmin = false;
+            if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+                try {
+                    const token = req.headers.authorization.split(" ")[1];
+                    const jwt = require("jsonwebtoken");
+                    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                    const User = require("../models/user");
+                    const user = await User.findById(decoded.id);
+                    if (user && user.role === 'admin') {
+                        isAdmin = true;
+                    }
+                } catch (error) {
+                    console.error("Token verification failed in getDocuments", error);
+                }
+            }
+            if (!isAdmin) {
+                return res.status(403).json({ message: "Only admins can filter by uploadedBy" });
+            }
+            query.uploadedBy = uploadedBy;
+        }
+
         let sortOption = { createdAt: -1 }; // Default: Newest first
         
         if (sort === 'oldest') {
@@ -103,7 +128,7 @@ const getDocuments = async (req, res) => {
         }
 
         const documents = await Document.find(query)
-            .collation({ locale: "en", strength: 2 }) // Ensure case-insensitive alphabetical sorting
+            .collation({ locale: "en", strength: 2, numericOrdering: true }) // Ensure case-insensitive alphabetical and numeric sorting
             .populate("uploadedBy", "name")
             .populate("category", "name") // Populate category
             .sort(sortOption);
@@ -223,7 +248,10 @@ const deleteDocument = async (req, res) => {
 // @access  Private (Faculty/Admin)
 const updateDocument = async (req, res) => {
     try {
-        const { title, description, department, subject, semester, linkUrl, category } = req.body;
+        let { title, description, department, subject, semester, linkUrl, category } = req.body;
+        
+        if (title) title = title.replace(/\s+/g, ' ').trim();
+        
         const document = await Document.findById(req.params.id);
 
         if (!document) {

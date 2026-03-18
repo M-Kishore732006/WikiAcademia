@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const { upload, uploadDocument, getDocuments, downloadDocument, deleteDocument, updateDocument } = require("../controllers/documentController");
-const { protect, authorize } = require("../middleware/authMiddleware");
+const { protect, authorizeRoles } = require("../middleware/authMiddleware");
 
 const multer = require("multer");
 
@@ -34,12 +34,12 @@ const handleUploadError = (req, res, next) => {
 };
 
 router.route("/")
-    .post(protect, authorize("faculty", "admin"), handleUploadError, validateUpload, uploadDocument)
+    .post(protect, authorizeRoles("faculty", "admin"), handleUploadError, validateUpload, uploadDocument)
     .get(getDocuments);
 
 router.route("/:id")
-    .put(protect, authorize("faculty", "admin"), updateDocument)
-    .delete(protect, authorize("faculty", "admin"), deleteDocument);
+    .put(protect, authorizeRoles("faculty", "admin"), updateDocument)
+    .delete(protect, authorizeRoles("faculty", "admin"), deleteDocument);
 
 router.route("/:id/download").get(downloadDocument);
 

@@ -1,0 +1,306 @@
+/* ManageUsers.css */
+.manage-users-container {
+    margin-top: 3rem !important; /* Hard-forces margin against the Navbar */
+    padding: 2rem 1rem 6rem 1rem;
+}
+
+.mu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.mu-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+    font-size: 1.75rem; /* Forces it to fit cleanly without overflowing visually */
+}
+
+.mu-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.mu-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+}
+
+.mu-stat-icon {
+    padding: 1rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.mu-stat-icon.total { background: rgba(0, 123, 255, 0.1); color: var(--primary); }
+.mu-stat-icon.faculty { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+.mu-stat-icon.students { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+
+.mu-main-card {
+    padding: 0;
+    overflow: hidden;
+    margin-bottom: 4rem; /* Additional buffer above the footer */
+}
+
+.mu-toolbar {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background-color: rgba(0,0,0,0.02);
+}
+[data-theme='dark'] .mu-toolbar {
+    background-color: rgba(255,255,255,0.02);
+}
+
+.mu-search {
+    position: relative;
+    flex: 1;
+    min-width: 250px;
+    max-width: 400px;
+}
+.mu-search input {
+    padding-left: 2.5rem;
+    margin: 0;
+}
+.mu-search .icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+.mu-filters {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.mu-filters select {
+    margin: 0;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.mu-table-container {
+    overflow-x: auto;
+    min-height: 400px;
+    padding-bottom: 1rem; /* Prevent badges/shadows from touching the lower border strictly */
+}
+
+.mu-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.mu-table th {
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    background-color: rgba(0,0,0,0.01);
+}
+[data-theme='dark'] .mu-table th {
+     background-color: rgba(255,255,255,0.01);
+}
+
+.mu-table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+.mu-table tr {
+    transition: background-color 0.2s;
+}
+.mu-table tr:hover {
+    background-color: rgba(0,0,0,0.02);
+}
+[data-theme='dark'] .mu-table tr:hover {
+    background-color: rgba(255,255,255,0.02);
+}
+
+.mu-user-cell {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.mu-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+.mu-avatar.admin { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+.mu-avatar.faculty { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+.mu-avatar.student { background: linear-gradient(135deg, #9ca3af, #4b5563); }
+
+/* Custom Badge specifically fixing Dark Mode */
+.mu-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+}
+.mu-badge.admin { background-color: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+.mu-badge.faculty { background-color: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+.mu-badge.student { background-color: #dcfce7; color: #166534; border-color: #86efac; }
+
+[data-theme='dark'] .mu-badge.admin { background-color: rgba(153, 27, 27, 0.4); color: #fca5a5; border-color: rgba(248, 113, 113, 0.5); }
+[data-theme='dark'] .mu-badge.faculty { background-color: rgba(30, 64, 175, 0.4); color: #93c5fd; border-color: rgba(96, 165, 250, 0.5); }
+[data-theme='dark'] .mu-badge.student { background-color: rgba(22, 101, 52, 0.4); color: #86efac; border-color: rgba(74, 222, 128, 0.5); }
+
+.mu-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+.mu-actions button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.mu-actions button:hover { background: rgba(0,0,0,0.05); }
+.mu-actions button.edit:hover { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+.mu-actions button.reset:hover { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+.mu-actions button.delete:hover { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+
+[data-theme='dark'] .mu-actions button:hover { background: rgba(255,255,255,0.05); }
+
+/* Modal Overlay */
+.mu-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.mu-modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 450px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+.mu-modal-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.mu-modal-header h2 { margin: 0; font-size: 1.25rem; }
+.mu-modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+}
+.mu-modal-close:hover { color: var(--text-main); }
+
+.mu-modal-body {
+    padding: 1.5rem;
+}
+
+.mu-form-group {
+    margin-bottom: 1rem;
+}
+.mu-form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+.mu-form-group input, .mu-form-group select {
+    margin-bottom: 0;
+}
+
+.mu-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.mu-pagination {
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border);
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    background-color: rgba(0,0,0,0.01);
+}
+[data-theme='dark'] .mu-pagination {
+    background-color: rgba(255,255,255,0.01);
+}
+
+.mu-toast {
+    position: fixed;
+    top: 5rem;
+    right: 2rem;
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 500;
+}
+.mu-toast.success { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+.mu-toast.error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+[data-theme='dark'] .mu-toast.success { background: rgba(22, 101, 52, 0.9); color: #86efac; border-color: #166534; }
+[data-theme='dark'] .mu-toast.error { background: rgba(153, 27, 27, 0.9); color: #fca5a5; border-color: #991b1b; }
+
+.mu-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    color: var(--text-muted);
+    text-align: center;
+}

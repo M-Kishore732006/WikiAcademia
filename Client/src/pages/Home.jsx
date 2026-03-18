@@ -2,7 +2,6 @@ import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Upload, Search, ArrowRight } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
-import FacultyUpload from '../components/FacultyUpload';
 
 const Home = () => {
     const { user } = useContext(AuthContext);
@@ -28,13 +27,6 @@ const Home = () => {
                             </Link>
                         )}
                     </div>
-
-                    {/* Faculty Upload Section - Visible only to Faculty and Admin */}
-                    {user && (user.role === 'faculty' || user.role === 'admin') && (
-                        <div className="mt-12 animate-fade-in">
-                            <FacultyUpload />
-                        </div>
-                    )}
                 </div>
             </section>
 

@@ -201,7 +201,7 @@ const Dashboard = () => {
                                 <input
                                     type="file"
                                     accept=".pdf,.odf,.ppt,.pptx"
-                                    className="input-field bg-white"
+                                    className="input-field"
                                     onChange={handleFileChange}
                                     required
                                 />

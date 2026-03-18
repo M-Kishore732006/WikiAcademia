@@ -30,7 +30,7 @@ const protect = async (req, res, next) => {
     }
 };
 
-const authorize = (...roles) => {
+const authorizeRoles = (...roles) => {
     return (req, res, next) => {
         if (!roles.includes(req.user.role)) {
             return res.status(403).json({
@@ -41,4 +41,4 @@ const authorize = (...roles) => {
     };
 };
 
-module.exports = { protect, authorize };
+module.exports = { protect, authorizeRoles };
