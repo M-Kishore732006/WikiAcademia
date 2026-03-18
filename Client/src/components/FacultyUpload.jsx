@@ -90,7 +90,7 @@ const FacultyUpload = () => {
             </div>
 
             {message && (
-                <div className={`p-4 rounded mb-6 flex items-center gap-2 ${message.startsWith('success') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                <div className={`p-4 rounded mb-6 flex items-center gap-2 font-medium shadow-sm ${message.startsWith('success') ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
                     {message.replace('success: ', '').replace('error: ', '')}
                 </div>
             )}

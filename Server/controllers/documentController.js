@@ -1,6 +1,7 @@
 const Document = require("../models/Document");
 const mongoose = require("mongoose");
 const upload = require("../config/gridfs");
+const cloudinary = require("../config/cloudinary"); // Globally configure and import Cloudinary
 
 // @desc    Upload a document (PDF or Link)
 // @route   POST /api/documents
@@ -27,8 +28,24 @@ const uploadDocument = async (req, res) => {
             if (!req.file) {
                 return res.status(400).json({ message: "Please upload a document file" });
             }
-            // Store Cloudinary secure_url for retrieval
-            fileUrl = req.file.path;
+
+            const path = require("path");
+            const ext = path.extname(req.file.originalname);
+            const name = path.basename(req.file.originalname, ext).replace(/[^a-zA-Z0-9]/g, '_');
+            const public_id = `${name}_${Date.now()}${ext}`;
+
+            // Upload the memory buffer stream directly to Cloudinary using upload_stream
+            fileUrl = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    { folder: 'academic_documents', resource_type: 'raw', public_id: public_id },
+                    (error, result) => {
+                        if (error) return reject(error);
+                        resolve(result.secure_url);
+                    }
+                );
+                // End the stream and trigger the upload by writing the buffer to it
+                uploadStream.end(req.file.buffer);
+            });
         } else if (materialType === "Link") {
             if (!linkUrl) {
                 return res.status(400).json({ message: "Please provide a valid link" });

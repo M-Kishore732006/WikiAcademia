@@ -252,7 +252,7 @@ const Browse = () => {
                         <div className="flex-1">
                             <div className="flex justify-between items-start mb-2 gap-3">
                                 <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 line-clamp-2 pr-2">{doc.title}</h3>
-                                <span className={`text-xs px-6 pt-1 pb-1.5 rounded-full whitespace-nowrap shrink-0 font-medium ${doc.materialType === 'Link' ? 'bg-blue-100 text-blue-800 dark:text-blue-900' : 'bg-red-100 text-red-800 dark:text-red-900'}`}>
+                                <span className="text-xs px-6 pt-1 pb-1.5 rounded-full whitespace-nowrap shrink-0 font-bold shadow-sm inline-block" style={{ backgroundColor: '#0ea5e9', color: '#ffffff', border: '1px solid #0284c7' }}>
                                     {doc.materialType === 'Link' ? 'Link' : (doc.fileUrl ? doc.fileUrl.split('.').pop().toUpperCase() : 'PDF')}
                                 </span>
                             </div>

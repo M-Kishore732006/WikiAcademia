@@ -220,7 +220,7 @@ const Dashboard = () => {
                     </div>
 
                     {message && (
-                        <div className={`p-4 rounded mt-4 mb-2 ${message.includes('success') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        <div className={`p-4 rounded mt-4 mb-2 font-medium shadow-sm flex items-center gap-2 ${message.includes('success') ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
                             {message}
                         </div>
                     )}
