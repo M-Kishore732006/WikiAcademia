@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Upload, Search, ArrowRight } from 'lucide-react';
+import { BookOpen, Upload, Search, ArrowRight, Bot } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
 
 const Home = () => {
@@ -35,29 +35,46 @@ const Home = () => {
                 <div className="container">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {/* Feature 1 */}
-                        <div className="card text-center hover:shadow-lg transition-shadow">
-                            <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
+                        <Link to="/browse" className="card text-center hover:shadow-lg transition-shadow cursor-pointer block text-inherit no-underline" style={{ color: 'inherit' }}>
+                            <div className="bg-blue-100 dark:bg-blue-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
                                 <Search size={32} />
                             </div>
                             <h3 className="text-xl font-bold mb-2">Smart Search</h3>
                             <p className="text-secondary">
                                 Quickly find resources by subject, department, or semester using our advanced filtering system.
                             </p>
-                        </div>
+                        </Link>
 
-                        {/* Feature 2 */}
-                        <div className="card text-center hover:shadow-lg transition-shadow">
-                            <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-success">
-                                <BookOpen size={32} />
+                        {/* Feature 2: WikAI Placeholder */}
+                        <div 
+                            onClick={() => alert('WikAI Chatbot coming soon! This will act as our intelligent AI assistant to help you read and query documents.')}
+                            className="card text-center hover:shadow-lg transition-shadow cursor-pointer block text-inherit no-underline" style={{ color: 'inherit' }}
+                        >
+                            <div 
+                                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-white shadow-lg"
+                                style={{ background: 'linear-gradient(to top right, #6366f1, #a855f7, #ec4899)', boxShadow: '0 10px 15px -3px rgba(168, 85, 247, 0.3)' }}
+                            >
+                                <Bot size={32} />
                             </div>
-                            <h3 className="text-xl font-bold mb-2">Access Anyway</h3>
+                            <h3 className="text-xl font-bold mb-2">WikAI Assistant</h3>
                             <p className="text-secondary">
-                                View PDF documents directly in your browser or access external learning resources instantly.
+                                An intelligent AI chatbot that reads your uploaded materials and answers your questions. (Coming Soon)
                             </p>
                         </div>
 
                         {/* Feature 3 */}
-                        <div className="card text-center hover:shadow-lg transition-shadow">
+                        <div 
+                            onClick={() => {
+                                if (!user) {
+                                    window.location.href = '/login';
+                                } else if (user.role === 'faculty' || user.role === 'admin') {
+                                    window.location.href = '/dashboard';
+                                } else {
+                                    alert('This feature requires Faculty access. Please contact an admin if you need to upload materials.');
+                                }
+                            }}
+                            className="card text-center hover:shadow-lg transition-shadow cursor-pointer block text-inherit no-underline"
+                        >
                             <div className="bg-primary-gradient w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-white">
                                 <Upload size={32} />
                             </div>
