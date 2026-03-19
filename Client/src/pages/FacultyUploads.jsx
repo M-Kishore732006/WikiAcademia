@@ -97,7 +97,8 @@ const FacultyUploads = () => {
             window.open(linkUrl, '_blank', 'noopener,noreferrer');
             return;
         }
-        window.open(`http://localhost:5000/api/documents/${id}/download`, '_blank', 'noopener,noreferrer');
+        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        window.open(`${baseUrl}/documents/${id}/download`, '_blank', 'noopener,noreferrer');
     };
 
     const handleDelete = async (id) => {
