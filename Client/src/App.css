@@ -75,6 +75,18 @@ body {
   background-color: var(--background);
   color: var(--text-main);
   line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Smooth touch scrolling on mobile */
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Better touch targets for all buttons */
+button, a, [role="button"] {
+  touch-action: manipulation;
 }
 
 a {
@@ -111,6 +123,12 @@ h2 {
 
 h3 {
   font-size: 1.5rem;
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.4rem; }
+  h3 { font-size: 1.15rem; }
 }
 
 p {
@@ -210,7 +228,7 @@ p {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 var(--space-4);
+  padding: 0 clamp(1rem, 4vw, 2rem);
 }
 
 .flex {
@@ -295,6 +313,28 @@ p {
   .hidden-mobile {
     display: none;
   }
+
+  /* Make filter/control bars stack on mobile */
+  .mobile-stack {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .mobile-full-width {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Tighter padding on small screens */
+  .py-20 {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+
+  .py-16 {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
 }
 
 /* Mobile Visibility Utilities */
@@ -314,6 +354,11 @@ p {
   display: none;
 }
 
+/* hidden md:inline used in sort button text */
+.hidden.md\:inline {
+  display: none;
+}
+
 @media (min-width: 768px) {
   .md\:hidden {
     display: none;
@@ -326,6 +371,28 @@ p {
 
   .md\:flex {
     display: flex;
+  }
+
+  .hidden.md\:inline {
+    display: inline;
+  }
+
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .md\:grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .md\:flex-row {
+    flex-direction: row;
+  }
+}
+
+@media (min-width: 640px) {
+  .sm\:flex-row {
+    flex-direction: row;
   }
 }
 

@@ -9,26 +9,26 @@ const Home = () => {
     return (
         <div className="home-page">
             {/* Hero Section */}
-            <section className="bg-surface py-20 border-b border-gray-200">
-                <div className="container text-center">
-                    <h1 className="text-4xl md:text-6xl font-extrabold text-gradient mb-6">
-                        Digital Academic Knowledge Repository
-                    </h1>
-                    <p className="text-xl text-secondary mb-8 max-w-2xl mx-auto">
-                        Access a vast collection of study materials, lecture notes, and research papers via our centralized platform.
-                    </p>
-                    <div className="flex justify-center gap-4">
-                        <Link to="/browse" className="btn btn-primary text-lg px-8 py-3 no-underline text-white">
-                            Browse Materials <ArrowRight size={20} />
+        <section className="bg-surface py-20 border-b border-gray-200">
+            <div className="container text-center">
+                <h1 className="text-4xl md:text-6xl font-extrabold text-gradient mb-6" style={{ fontSize: 'clamp(1.6rem, 6vw, 3.75rem)' }}>
+                    Digital Academic Knowledge Repository
+                </h1>
+                <p className="text-xl text-secondary mb-8 max-w-2xl mx-auto" style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)' }}>
+                    Access a vast collection of study materials, lecture notes, and research papers via our centralized platform.
+                </p>
+                <div className="flex flex-col sm:flex-row justify-center gap-4" style={{ alignItems: 'center' }}>
+                    <Link to="/browse" className="btn btn-primary text-lg px-8 py-3 no-underline text-white w-full sm:w-auto" style={{ maxWidth: '280px' }}>
+                        Browse Materials <ArrowRight size={20} />
+                    </Link>
+                    {!user && (
+                        <Link to="/register" className="btn btn-outline text-lg px-8 py-3 no-underline w-full sm:w-auto" style={{ maxWidth: '280px' }}>
+                            Join Now
                         </Link>
-                        {!user && (
-                            <Link to="/register" className="btn btn-outline text-lg px-8 py-3 no-underline">
-                                Join Now
-                            </Link>
-                        )}
-                    </div>
+                    )}
                 </div>
-            </section>
+            </div>
+        </section>
 
             {/* Features Section */}
             <section className="py-16 bg-background">

@@ -157,11 +157,11 @@ const FacultyUploads = () => {
                     <p className="text-secondary mt-1">Viewing all documents uploaded by this specific user.</p>
                 </div>
 
-                {/* Unified Horizontal Container for All Controls */}
-                <div className="flex flex-wrap items-center gap-3">
+                {/* Responsive Controls Container */}
+                <div className="flex flex-wrap items-center gap-3" style={{ width: '100%' }}>
                     
                     {/* Search Bar */}
-                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flex: '1 1 180px', minWidth: 0 }}>
                         <svg 
                             style={{ position: 'absolute', left: '12px', color: '#9ca3af', pointerEvents: 'none' }} 
                             width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
@@ -173,17 +173,17 @@ const FacultyUploads = () => {
                             type="text"
                             placeholder="Search their materials..."
                             className="input-field"
-                            style={{ minWidth: '220px', paddingLeft: '36px' }}
+                            style={{ paddingLeft: '36px', width: '100%' }}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
 
                     {/* Category Dropdown */}
-                    <div>
+                    <div style={{ flex: '1 1 140px', minWidth: 0 }}>
                         <select
                             className="input-field"
-                            style={{ minWidth: '180px' }}
+                            style={{ width: '100%' }}
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.target.value)}
                         >

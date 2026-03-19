@@ -21,8 +21,8 @@ const Login = () => {
     };
 
     return (
-        <div className="container flex justify-center items-center" style={{ minHeight: '80vh' }}>
-            <div className="card w-full max-w-md bg-surface">
+        <div className="container flex justify-center items-center" style={{ minHeight: '80vh', padding: '2rem clamp(1rem, 4vw, 2rem)' }}>
+            <div className="card w-full max-w-md bg-surface" style={{ width: '100%' }}>
                 <h2 className="text-2xl text-center text-primary mb-6">Welcome Back</h2>
                 {error && <div className="bg-red-100 border border-red-500 text-red-700 p-3 rounded mb-4 text-sm">{error}</div>}
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">

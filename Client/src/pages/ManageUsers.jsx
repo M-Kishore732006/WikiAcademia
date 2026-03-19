@@ -303,6 +303,8 @@ const ManageUsers = () => {
                             <p>Try adjusting your search or role filters.</p>
                         </div>
                     ) : (
+                        <>
+                        {/* Desktop Table */}
                         <table className="mu-table">
                             <thead>
                                 <tr>
@@ -383,6 +385,55 @@ const ManageUsers = () => {
                                 ))}
                             </tbody>
                         </table>
+
+                        {/* Mobile Card List */}
+                        <div className="mu-card-list">
+                            {currentTableUsers.map(u => (
+                                <div key={u._id} className="mu-user-card">
+                                    <div className={`mu-avatar ${u.role}`} style={{ flexShrink: 0 }}>
+                                        {getInitials(u.name, u.email)}
+                                    </div>
+                                    <div className="mu-user-card-info">
+                                        <div className="name">{u.name || 'Unnamed Record'}</div>
+                                        <div className="email">{u.email}</div>
+                                        <div style={{ marginTop: '0.4rem' }}>
+                                            <span className={`mu-badge ${u.role}`}>
+                                                {u.role.charAt(0).toUpperCase() + u.role.slice(1)}
+                                            </span>
+                                        </div>
+                                        <div className="mu-user-card-actions">
+                                            {(u.role === 'faculty' || u.role === 'admin') && (
+                                                <button 
+                                                    onClick={() => navigate(`/manage-users/${u._id}/uploads?name=${encodeURIComponent(u.name || u.email)}`)}
+                                                    className="mu-actions view-uploads"
+                                                    title="View Uploads"
+                                                    style={{ color: 'var(--primary)', background: 'rgba(59, 130, 246, 0.1)', border: 'none', borderRadius: '0.4rem', padding: '0.4rem', cursor: 'pointer', display:'flex', alignItems:'center' }}
+                                                >
+                                                    <FolderOpen size={16} />
+                                                </button>
+                                            )}
+                                            <button 
+                                                onClick={() => { setSelectedUser(u); setEditUserName(u.name||''); setEditUserEmail(u.email||''); setEditUserRole(u.role||''); setIsEditModalOpen(true); }}
+                                                style={{ background: 'rgba(59,130,246,0.1)', color:'#3b82f6', border:'none', borderRadius:'0.4rem', padding:'0.4rem', cursor:'pointer', display:'flex', alignItems:'center' }}
+                                                title="Edit"
+                                            ><Edit2 size={16} /></button>
+                                            <button 
+                                                onClick={() => handleResetPassword(u._id)}
+                                                style={{ background: 'rgba(245,158,11,0.1)', color:'#f59e0b', border:'none', borderRadius:'0.4rem', padding:'0.4rem', cursor:'pointer', display:'flex', alignItems:'center' }}
+                                                title="Reset Password"
+                                            ><KeyRound size={16} /></button>
+                                            <button 
+                                                onClick={() => { setSelectedUser(u); setIsDeleteModalOpen(true); }}
+                                                disabled={u.role === 'admin'}
+                                                style={{ background: 'rgba(239,68,68,0.1)', color:'#ef4444', border:'none', borderRadius:'0.4rem', padding:'0.4rem', cursor: u.role==='admin'?'not-allowed':'pointer', opacity: u.role==='admin'?0.3:1, display:'flex', alignItems:'center' }}
+                                                title="Delete"
+                                            ><Trash2 size={16} /></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        </>
                     )}
                 </div>
 
