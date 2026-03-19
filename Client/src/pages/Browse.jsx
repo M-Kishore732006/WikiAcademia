@@ -143,11 +143,11 @@ const Browse = () => {
             <div className="flex flex-wrap items-center justify-between mb-8 gap-4">
                 <h1 className="text-2xl font-bold text-primary m-0 whitespace-nowrap">Study Materials</h1>
                 
-                {/* Responsive Controls Container */}
-                <div className="flex flex-wrap items-center gap-3" style={{ width: '100%' }}>
+                {/* Unified Horizontal Container for All Controls */}
+                <div className="flex flex-wrap items-center gap-3">
                     
                     {/* Search Bar */}
-                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flex: '1 1 180px', minWidth: 0 }}>
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                         <svg 
                             style={{ position: 'absolute', left: '12px', color: '#9ca3af', pointerEvents: 'none' }} 
                             width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
@@ -159,17 +159,17 @@ const Browse = () => {
                             type="text"
                             placeholder="Search materials..."
                             className="input-field"
-                            style={{ paddingLeft: '36px', width: '100%' }}
+                            style={{ minWidth: '220px', paddingLeft: '36px' }}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
 
                     {/* Category Dropdown */}
-                    <div style={{ flex: '1 1 140px', minWidth: 0 }}>
+                    <div>
                         <select
                             className="input-field"
-                            style={{ width: '100%' }}
+                            style={{ minWidth: '180px' }}
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.target.value)}
                         >
@@ -179,7 +179,7 @@ const Browse = () => {
                             ))}
                         </select>
                     </div>
-                        
+                            
                     {/* Sort Container */}
                     <div className="relative shrink-0 sort-container" style={{ position: 'relative' }}>
                         <button 
@@ -246,6 +246,7 @@ const Browse = () => {
                     </div>
                 </div>
             </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {documents.map(doc => (
