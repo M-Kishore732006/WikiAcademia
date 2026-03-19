@@ -16,10 +16,13 @@ const uploadDocument = async (req, res) => {
             semester,
             materialType,
             linkUrl,
-            category // Can be ID or Name
+            category, // Can be ID or Name
+            visibility
         } = req.body;
 
         if (title) title = title.replace(/\s+/g, ' ').trim();
+        // Default visibility to 'public' if not provided
+        if (!visibility || !['public','private'].includes(visibility)) visibility = 'public';
 
         let fileUrl = "";
 
@@ -79,7 +82,8 @@ const uploadDocument = async (req, res) => {
             fileUrl,
             linkUrl,
             category: categoryId,
-            uploadedBy: req.user._id
+            uploadedBy: req.user._id,
+            visibility
         });
 
         res.status(201).json(document);
@@ -91,11 +95,36 @@ const uploadDocument = async (req, res) => {
 // @desc    Get all documents with filtering
 // @route   GET /api/documents
 // @access  Public
+// Helper: try to decode JWT from request, returns user object or null
+const tryGetUser = async (req) => {
+    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+        try {
+            const token = req.headers.authorization.split(" ")[1];
+            const jwt = require("jsonwebtoken");
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const User = require("../models/user");
+            return await User.findById(decoded.id);
+        } catch (e) {
+            return null;
+        }
+    }
+    return null;
+};
+
+// @desc    Get all documents with filtering
+// @route   GET /api/documents
+// @access  Public (but private docs filtered for unauthenticated users)
 const getDocuments = async (req, res) => {
     try {
         const { department, semester, subject, search, category, sort } = req.query;
 
         let query = {};
+
+        // Visibility filter: unauthenticated users only see public or legacy docs
+        const requestUser = await tryGetUser(req);
+        if (!requestUser) {
+            query.visibility = { $ne: 'private' };
+        }
 
         if (department) query.department = department;
         if (semester) query.semester = semester;
@@ -103,32 +132,26 @@ const getDocuments = async (req, res) => {
         if (category) query.category = category;
 
         if (search) {
-            query.$or = [
-                { title: { $regex: search, $options: "i" } },
-                { subject: { $regex: search, $options: "i" } },
-                { description: { $regex: search, $options: "i" } },
-                { semester: { $regex: search, $options: "i" } }
-            ];
+            const searchFilter = {
+                $or: [
+                    { title: { $regex: search, $options: "i" } },
+                    { subject: { $regex: search, $options: "i" } },
+                    { description: { $regex: search, $options: "i" } },
+                    { semester: { $regex: search, $options: "i" } }
+                ]
+            };
+            
+            // If we already have filters (like visibility), use $and to combine them
+            if (Object.keys(query).length > 0) {
+                query = { $and: [query, searchFilter] };
+            } else {
+                query = searchFilter;
+            }
         }
 
         const { uploadedBy } = req.query;
         if (uploadedBy) {
-            let isAdmin = false;
-            if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-                try {
-                    const token = req.headers.authorization.split(" ")[1];
-                    const jwt = require("jsonwebtoken");
-                    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                    const User = require("../models/user");
-                    const user = await User.findById(decoded.id);
-                    if (user && user.role === 'admin') {
-                        isAdmin = true;
-                    }
-                } catch (error) {
-                    console.error("Token verification failed in getDocuments", error);
-                }
-            }
-            if (!isAdmin) {
+            if (!requestUser || requestUser.role !== 'admin') {
                 return res.status(403).json({ message: "Only admins can filter by uploadedBy" });
             }
             query.uploadedBy = uploadedBy;
@@ -150,6 +173,20 @@ const getDocuments = async (req, res) => {
             .populate("category", "name") // Populate category
             .sort(sortOption);
 
+        // Privacy feature: hide uploader name for unauthenticated users
+        if (!requestUser) {
+            const anonymizedDocs = documents.map(doc => {
+                const docObj = doc.toObject();
+                if (docObj.uploadedBy) {
+                    docObj.uploadedBy.name = 'Unknown';
+                    // We also clear the _id for extra privacy if desired, 
+                    // but keeping it as a string instead of object would also break doc.uploadedBy.name
+                }
+                return docObj;
+            });
+            return res.json(anonymizedDocs);
+        }
+
         res.json(documents);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -164,6 +201,14 @@ const downloadDocument = async (req, res) => {
         const document = await Document.findById(req.params.id);
 
         if (document) {
+            // Gate private documents behind authentication
+            if (document.visibility === 'private') {
+                const requestUser = await tryGetUser(req);
+                if (!requestUser) {
+                    return res.status(401).json({ message: "Please log in to access this document" });
+                }
+            }
+
             document.downloads = document.downloads + 1;
             await document.save();
 
@@ -265,7 +310,7 @@ const deleteDocument = async (req, res) => {
 // @access  Private (Faculty/Admin)
 const updateDocument = async (req, res) => {
     try {
-        let { title, description, department, subject, semester, linkUrl, category } = req.body;
+        let { title, description, department, subject, semester, linkUrl, category, visibility } = req.body;
         
         if (title) title = title.replace(/\s+/g, ' ').trim();
         
@@ -301,6 +346,7 @@ const updateDocument = async (req, res) => {
         document.semester = semester || document.semester;
         document.linkUrl = linkUrl || document.linkUrl;
         document.category = categoryId;
+        document.visibility = visibility || document.visibility;
 
         const updatedDocument = await document.save();
         res.json(updatedDocument);

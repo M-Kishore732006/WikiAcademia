@@ -7,7 +7,6 @@ const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [role, setRole] = useState('student');
     const { register } = useContext(AuthContext);
     const navigate = useNavigate();
     const [error, setError] = useState('');
@@ -15,7 +14,7 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await register(name, email, password, role);
+            await register(name, email, password, 'student');
             navigate('/');
         } catch (err) {
             setError(err.response?.data?.message || 'Registration failed');
@@ -68,20 +67,15 @@ const Register = () => {
                             {showPassword ? "Hide" : "Show"}
                         </button>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">I am a...</label>
-                        <select
-                            className="input-field"
-                            value={role}
-                            onChange={(e) => setRole(e.target.value)}
-                        >
-                            <option value="student">Student</option>
-                            <option value="faculty">Faculty</option>
-                        </select>
+
+                    {/* Role info note — not selectable */}
+                    <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 text-xs text-blue-700 dark:text-blue-300">
+                        <span>ℹ️</span>
+                        <span>All self-registered accounts are created as <strong>Students</strong>. Faculty accounts are created by administrators.</span>
                     </div>
 
                     <button type="submit" className="btn btn-primary w-full py-3 mt-2">
-                        Register
+                        Register as Student
                     </button>
                 </form>
                 <div className="mt-6 text-center text-sm text-secondary">

@@ -13,12 +13,11 @@ const generateToken = (id) => {
 exports.registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    let role = req.body.role || "student";
-    
-    // Security: Prevent self-registration as admin
-    if (role === "admin") {
-      role = "student";
-    }
+    // Public registration is ALWAYS student — admin creates faculty via Manage Users
+    const role = "student";
+
+    // Security: Prevent self-registration as admin (redundant but kept for safety)
+    // role is already forced to student above
 
     // Check if user exists
     const userExists = await User.findOne({ email });

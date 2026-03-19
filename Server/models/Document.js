@@ -39,6 +39,11 @@ const documentSchema = new mongoose.Schema(
       ref: "User",
       required: true
     },
+    visibility: {
+      type: String,
+      enum: ["public", "private"],
+      default: "public"
+    },
     downloads: {
       type: Number,
       default: 0

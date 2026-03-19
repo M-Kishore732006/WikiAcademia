@@ -12,6 +12,7 @@ const Dashboard = () => {
     const [materialType, setMaterialType] = useState('File');
     const [linkUrl, setLinkUrl] = useState('');
     const [file, setFile] = useState(null);
+    const [visibility, setVisibility] = useState('public');
     const [message, setMessage] = useState('');
     const [isUploading, setIsUploading] = useState(false);
 
@@ -52,6 +53,7 @@ const Dashboard = () => {
         formData.append('subject', subject);
         formData.append('semester', semester);
         formData.append('materialType', materialType);
+        formData.append('visibility', visibility);
         if (selectedCategory) {
             formData.append('category', selectedCategory);
         }
@@ -77,6 +79,7 @@ const Dashboard = () => {
             setLinkUrl('');
             setSelectedCategory('');
             setFile(null);
+            setVisibility('public');
         } catch (error) {
             setMessage(error.response?.data?.message || 'Upload failed');
         } finally {
@@ -91,7 +94,7 @@ const Dashboard = () => {
                 <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 border-b pb-4">Upload Study Material</h2>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                        <label className="block text-sm font-semibold text-label mb-1">
                             Document Title <span className="text-red-500 dark:text-red-400">*</span>
                         </label>
                         <input
@@ -105,7 +108,7 @@ const Dashboard = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description</label>
+                        <label className="block text-sm font-semibold text-label mb-1">Description</label>
                         <textarea
                             placeholder="Brief description of the content..."
                             className="input-field"
@@ -116,7 +119,7 @@ const Dashboard = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                        <label className="block text-sm font-semibold text-label mb-1">
                             Category (Select or Type New) <span className="text-red-500 dark:text-red-400">*</span>
                         </label>
                         <input
@@ -137,7 +140,7 @@ const Dashboard = () => {
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Department</label>
+                            <label className="block text-sm font-semibold text-label mb-1">Department</label>
                             <input
                                 type="text"
                                 placeholder="e.g. CSE"
@@ -147,7 +150,7 @@ const Dashboard = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Semester</label>
+                            <label className="block text-sm font-semibold text-label mb-1">Semester</label>
                             <input
                                 type="text"
                                 placeholder="e.g. 5"
@@ -159,7 +162,7 @@ const Dashboard = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Subject</label>
+                        <label className="block text-sm font-semibold text-label mb-1">Subject</label>
                         <input
                             type="text"
                             placeholder="e.g. Data Structures"
@@ -170,7 +173,7 @@ const Dashboard = () => {
                     </div>
 
                     <div className="p-4 bg-background rounded-lg border border-border">
-                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-3">
+                        <label className="block text-sm font-bold text-label mb-3">
                             Material Type <span className="text-red-500 dark:text-red-400">*</span>
                         </label>
                         <div className="flex gap-4 mb-4">
@@ -217,6 +220,34 @@ const Dashboard = () => {
                                 required
                             />
                         )}
+                    </div>
+
+                    {/* Visibility Toggle */}
+                    <div className="mb-6">
+                        <label className="block text-sm font-semibold text-label mb-2">
+                            Access Level
+                        </label>
+                        <div className="flex gap-3 w-fit">
+                            <button
+                                type="button"
+                                onClick={() => setVisibility('public')}
+                                className={`vis-toggle ${visibility === 'public' ? 'active public' : ''}`}
+                            >
+                                <span className="text-base">🌐</span> Public
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setVisibility('private')}
+                                className={`vis-toggle ${visibility === 'private' ? 'active private' : ''}`}
+                            >
+                                <span className="text-base">🔒</span> Private
+                            </button>
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5">
+                            {visibility === 'public'
+                                ? 'Visible to everyone, including users who are not logged in.'
+                                : 'Only visible to logged-in students and faculty.'}
+                        </p>
                     </div>
 
                     {message && (

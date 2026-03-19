@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { Trash2, Edit2, X, ArrowLeft } from 'lucide-react';
+import { Trash2, Edit2, X, ArrowLeft, Lock } from 'lucide-react';
 import api from '../utils/api';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
@@ -26,7 +26,8 @@ const FacultyUploads = () => {
         department: '',
         subject: '',
         semester: '',
-        linkUrl: ''
+        linkUrl: '',
+        visibility: 'public'
     });
 
     useEffect(() => {
@@ -121,7 +122,8 @@ const FacultyUploads = () => {
             department: doc.department || '',
             subject: doc.subject || '',
             semester: doc.semester || '',
-            linkUrl: doc.linkUrl || ''
+            linkUrl: doc.linkUrl || '',
+            visibility: doc.visibility || 'public'
         });
     };
 
@@ -272,10 +274,17 @@ const FacultyUploads = () => {
                             <div key={doc._id} className="card bg-surface flex flex-col h-full hover:shadow-lg transition-shadow">
                                 <div className="flex-1">
                                     <div className="flex justify-between items-start mb-2 gap-3">
-                                        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 line-clamp-2 pr-2">{doc.title}</h3>
-                                        <span className="text-xs px-6 pt-1 pb-1.5 rounded-full whitespace-nowrap shrink-0 font-bold shadow-sm inline-block" style={{ backgroundColor: '#0ea5e9', color: '#ffffff', border: '1px solid #0284c7' }}>
-                                            {doc.materialType === 'Link' ? 'Link' : (doc.fileUrl ? doc.fileUrl.split('.').pop().toUpperCase() : 'PDF')}
-                                        </span>
+                                        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 flex items-start gap-3">
+                                            {doc.visibility === 'private' && (
+                                                <Lock size={18} className="text-orange-500 mt-1 shrink-0" strokeWidth={2} />
+                                            )}
+                                            <span className="line-clamp-2">{doc.title}</span>
+                                        </h3>
+                                        <div className="flex items-center gap-1 flex-shrink-0">
+                                            <span className="text-xs px-6 pt-1 pb-1.5 rounded-full whitespace-nowrap font-bold shadow-sm inline-block" style={{ backgroundColor: '#0ea5e9', color: '#ffffff', border: '1px solid #0284c7' }}>
+                                                {doc.materialType === 'Link' ? 'Link' : (doc.fileUrl ? doc.fileUrl.split('.').pop().toUpperCase() : 'PDF')}
+                                            </span>
+                                        </div>
                                     </div>
                                     <p className="text-secondary text-sm mb-4 line-clamp-3">{doc.description}</p>
 
@@ -337,39 +346,54 @@ const FacultyUploads = () => {
 
             {/* Editing Modal reused from Browse.jsx */}
             {editingDoc && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-surface rounded-xl max-w-lg w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
-                        <div className="flex justify-between items-center mb-4">
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Edit Document</h2>
-                            <button onClick={() => setEditingDoc(null)} className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                            <button 
+                                onClick={() => setEditingDoc(null)} 
+                                className="btn-close-red"
+                                title="Close"
+                            >
                                 <X size={24} />
                             </button>
                         </div>
-                        <form onSubmit={handleUpdateSubmit} className="flex flex-col gap-4">
+                        <form onSubmit={handleUpdateSubmit} className="flex flex-col gap-5">
                             <div>
-                                <label className="block text-sm font-medium text-secondary mb-1">Title</label>
+                                <label className="block text-sm font-semibold text-label mb-1">Title</label>
                                 <input type="text" className="input-field" value={editFormData.title} onChange={e => setEditFormData({ ...editFormData, title: e.target.value })} required />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-secondary mb-1">Description</label>
+                                <label className="block text-sm font-semibold text-label mb-1">Access Level</label>
+                                <select 
+                                    className="input-field" 
+                                    value={editFormData.visibility || 'public'} 
+                                    onChange={e => setEditFormData({ ...editFormData, visibility: e.target.value })}
+                                >
+                                    <option value="public">🌐 Public</option>
+                                    <option value="private">🔒 Private</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-label mb-1">Description</label>
                                 <textarea className="input-field" rows="2" value={editFormData.description} onChange={e => setEditFormData({ ...editFormData, description: e.target.value })} />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-secondary mb-1">Department</label>
+                                    <label className="block text-sm font-semibold text-label mb-1">Department</label>
                                     <input type="text" className="input-field" value={editFormData.department} onChange={e => setEditFormData({ ...editFormData, department: e.target.value })} />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-secondary mb-1">Semester</label>
+                                    <label className="block text-sm font-semibold text-label mb-1">Semester</label>
                                     <input type="text" className="input-field" value={editFormData.semester} onChange={e => setEditFormData({ ...editFormData, semester: e.target.value })} />
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-secondary mb-1">Subject</label>
+                                <label className="block text-sm font-semibold text-label mb-1">Subject</label>
                                 <input type="text" className="input-field" value={editFormData.subject} onChange={e => setEditFormData({ ...editFormData, subject: e.target.value })} />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-secondary mb-1">Link URL (optional)</label>
+                                <label className="block text-sm font-semibold text-label mb-1">Link URL (optional)</label>
                                 <input type="text" className="input-field" value={editFormData.linkUrl} onChange={e => setEditFormData({ ...editFormData, linkUrl: e.target.value })} />
                             </div>
                             <button type="submit" className="btn btn-primary mt-2 py-2">Save Changes</button>
