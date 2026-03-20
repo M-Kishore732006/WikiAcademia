@@ -202,14 +202,18 @@
 /* Modal Overlay */
 .mu-modal-overlay {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
+    top: 0; left: 0; 
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
-    padding: 1rem;
+    z-index: 9999;
+    padding: 2rem 1rem;
+    overflow-y: auto;
+    pointer-events: auto;
 }
 
 .mu-modal {
@@ -220,6 +224,7 @@
     max-width: 450px;
     box-shadow: var(--shadow-lg);
     overflow: hidden;
+    margin: auto; /* Ensures perfect centering within the flex overlay */
 }
 
 .mu-modal-header {

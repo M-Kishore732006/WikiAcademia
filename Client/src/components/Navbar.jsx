@@ -77,40 +77,64 @@ const Navbar = () => {
 
             {/* Mobile Menu Dropdown */}
             {isMenuOpen && (
-                <div className="md:hidden bg-white border-t p-4 flex flex-col gap-4 shadow-lg absolute w-full left-0 top-60px" style={{ backgroundColor: 'var(--surface)' }}>
-                    <div className="flex justify-between items-center border-b pb-4 border-gray-100">
-                        <span className="text-secondary font-medium">Theme</span>
+                <div className="md:hidden bg-surface border-t border-border p-4 flex flex-col gap-2 shadow-2xl absolute w-full left-0 top-full z-[101] animate-fadeIn">
+                    <div className="flex justify-between items-center px-6 py-4 mb-2 bg-gray-50/50 dark:bg-gray-800/40 rounded-xl border border-border/30 gap-4">
+                        <span className="text-secondary font-semibold flex items-center gap-4">
+                             <Sun size={22} className="text-primary" />
+                             Appearance
+                        </span>
                         <button
                             onClick={toggleTheme}
-                            className="bg-transparent border-none cursor-pointer text-primary flex items-center gap-2"
+                            className="bg-primary/10 text-primary px-3 py-1.5 rounded-lg border border-primary/20 cursor-pointer font-bold text-[10px] uppercase tracking-widest transition-all hover:bg-primary/20 shadow-sm"
                         >
-                            {isDarkMode ? <><Sun size={20} /> Light Mode</> : <><Moon size={20} /> Dark Mode</>}
+                            {isDarkMode ? "Light Mode" : "Dark Mode"}
                         </button>
                     </div>
-                    <Link to="/browse" className="nav-link" onClick={() => setIsMenuOpen(false)}>Browse Materials</Link>
+
+                    <Link to="/browse" className="flex items-center px-6 py-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 text-secondary font-medium no-underline transition-all active:scale-[0.98] gap-4" onClick={() => setIsMenuOpen(false)}>
+                        <BookOpen size={22} className="text-primary" />
+                        Browse Materials
+                    </Link>
+
                     {user ? (
                         <>
                             {(user.role === 'faculty' || user.role === 'admin') && (
-                                <Link to="/dashboard" className="nav-link" onClick={() => setIsMenuOpen(false)}>Dashboard</Link>
+                                <Link to="/dashboard" className="flex items-center px-6 py-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 text-secondary font-medium no-underline transition-all active:scale-[0.98] gap-4" onClick={() => setIsMenuOpen(false)}>
+                                    <Upload size={22} className="text-primary" />
+                                    Dashboard
+                                </Link>
                             )}
                             {user.role === 'admin' && (
-                                <Link to="/manage-users" className="nav-link" onClick={() => setIsMenuOpen(false)}>Manage Users</Link>
+                                <Link to="/manage-users" className="flex items-center px-6 py-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 text-secondary font-medium no-underline transition-all active:scale-[0.98] gap-4" onClick={() => setIsMenuOpen(false)}>
+                                    <Users size={22} className="text-primary" />
+                                    Manage Users
+                                </Link>
                             )}
-                            <div className="border-t pt-2 mt-2">
-                                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Signed in as {user.name}</p>
+                            
+                            <div className="mt-2 pt-2 border-t border-border/50">
+                                <div className="flex items-center px-6 py-3 text-secondary font-medium border-none bg-transparent gap-4">
+                                    <User size={22} className="text-primary" />
+                                    <span>{user.name}</span>
+                                </div>
                                 <button
                                     onClick={() => { handleLogout(); setIsMenuOpen(false); }}
-                                    className="text-red-500 w-full text-left"
+                                    className="flex items-center px-6 py-4 w-full rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10 text-red-500 font-semibold border-none bg-transparent cursor-pointer transition-all active:scale-[0.98] gap-4"
                                 >
+                                    <LogOut size={22} />
                                     Logout
                                 </button>
                             </div>
                         </>
                     ) : (
-                        <>
-                            <Link to="/login" className="nav-link" onClick={() => setIsMenuOpen(false)}>Login</Link>
-                            <Link to="/register" className="btn btn-primary text-center text-white" onClick={() => setIsMenuOpen(false)}>Get Started</Link>
-                        </>
+                        <div className="flex flex-col gap-2 mt-2 pt-2 border-t border-border/50">
+                            <Link to="/login" className="flex items-center px-6 py-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 text-secondary font-medium no-underline transition-all active:scale-[0.98] gap-4" onClick={() => setIsMenuOpen(false)}>
+                                <User size={22} className="text-primary" />
+                                Login
+                            </Link>
+                            <Link to="/register" className="btn btn-primary w-full justify-center p-4 shadow-md mt-2" onClick={() => setIsMenuOpen(false)}>
+                                Get Started
+                            </Link>
+                        </div>
                     )}
                 </div>
             )}

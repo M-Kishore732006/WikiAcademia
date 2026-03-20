@@ -3,7 +3,8 @@ import api from '../utils/api';
 import './ManageUsers.css'; // Mapped vanilla CSS file
 import { 
     User, Trash2, KeyRound, Plus, Search, Filter, 
-    Edit2, ShieldAlert, GraduationCap, X, FolderOpen
+    Edit2, ShieldAlert, GraduationCap, X, FolderOpen,
+    UserPlus, Shield, Copy, CheckCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -24,6 +25,8 @@ const ManageUsers = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+    const [createdUserInfo, setCreatedUserInfo] = useState(null);
 
     const [selectedUser, setSelectedUser] = useState(null);
     
@@ -96,20 +99,27 @@ const ManageUsers = () => {
     const handleCreateSubmit = async (e) => {
         e.preventDefault();
         
-        let finalPassword = newUserPassword;
-        if (autoGeneratePassword) {
-             finalPassword = Math.random().toString(36).slice(-8) + "!"; 
-        }
-        
+        const finalPassword = newUserPassword;
         const endpoint = newUserRole === 'faculty' ? '/auth/create-faculty' : '/auth/create-student';
         
         try {
             await api.post(endpoint, {
-                name: newUserName || "User",
+                name: newUserName || (newUserRole === 'faculty' ? "Faculty Member" : "Student"),
                 email: newUserEmail,
                 password: finalPassword
             });
-            showToast(`${newUserRole} created successfully! ${autoGeneratePassword ? 'Pass: '+finalPassword : ''}`);
+            if (autoGeneratePassword) {
+                setCreatedUserInfo({
+                    name: newUserName || (newUserRole === 'faculty' ? "Faculty Member" : "Student"),
+                    email: newUserEmail,
+                    password: finalPassword,
+                    role: newUserRole
+                });
+                setIsSuccessModalOpen(true);
+            } else {
+                showToast(`${newUserRole} created successfully!`);
+            }
+            
             fetchUsers(); 
             
             setNewUserEmail('');
@@ -186,14 +196,15 @@ const ManageUsers = () => {
     };
 
     return (
-        <div className="container manage-users-container animate-fade-in">
-            
+        <>
             {toast && (
                 <div className={`mu-toast ${toast.type}`}>
                     {toast.message}
                     <button onClick={() => setToast(null)} style={{background:'transparent', border:'none', cursor:'pointer'}}><X size={16} /></button>
                 </div>
             )}
+
+            <div className="container manage-users-container animate-fade-in">
 
             <div className="mu-header">
                 <div>
@@ -386,6 +397,7 @@ const ManageUsers = () => {
                             </tbody>
                         </table>
 
+
                         {/* Mobile Card List */}
                         <div className="mu-card-list">
                             {currentTableUsers.map(u => (
@@ -464,6 +476,49 @@ const ManageUsers = () => {
                 )}
             </div>
 
+            </div>
+
+            {/* Success Modal for Auto-generated Password */}
+            {isSuccessModalOpen && createdUserInfo && (
+                <div className="mu-modal-overlay">
+                    <div className="mu-modal" style={{ maxWidth: '400px', textAlign: 'center', margin: 'auto' }}>
+                        <div className="mu-modal-header" style={{ justifyContent: 'center', borderBottom: 'none', paddingBottom: 0 }}>
+                            <div className="mu-stat-icon total" style={{ width: '60px', height: '60px', margin: '0 auto 1rem auto' }}>
+                                <CheckCircle size={32} className="text-success" />
+                            </div>
+                        </div>
+                        <div className="mu-modal-body" style={{ paddingTop: 0 }}>
+                            <h2 style={{ marginBottom: '0.5rem' }}>User Created!</h2>
+                            <p className="text-secondary mb-6">The account has been created successfully with an auto-generated password.</p>
+                            
+                            <div style={{ background: 'var(--background)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', marginBottom: '1.5rem' }}>
+                                <p className="text-sm text-secondary mb-1">Temporary Password</p>
+                                <div className="flex items-center justify-center gap-3">
+                                    <span className="text-xl font-mono font-bold tracking-wider text-primary">{createdUserInfo.password}</span>
+                                    <button 
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(createdUserInfo.password);
+                                            showToast('Password copied to clipboard!');
+                                        }}
+                                        className="p-2 rounded-lg hover:bg-surface text-secondary hover:text-primary transition-colors border-none bg-transparent cursor-pointer"
+                                        title="Copy Password"
+                                    >
+                                        <Copy size={18} />
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <button 
+                                onClick={() => setIsSuccessModalOpen(false)}
+                                className="btn btn-primary w-full py-3"
+                            >
+                                Done
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Create Modal */}
             {isCreateModalOpen && (
                 <div className="mu-modal-overlay">
@@ -487,16 +542,31 @@ const ManageUsers = () => {
                                 <div className="mu-form-group">
                                     <label>Assigned Role</label>
                                     <select className="input-field" value={newUserRole} onChange={(e) => setNewUserRole(e.target.value)}>
-                                        <option value="student">Student User</option>
-                                        <option value="faculty">Faculty Member</option>
+                                        <option value="student">Student</option>
+                                        <option value="faculty">Faculty</option>
                                     </select>
                                 </div>
                                 <div className="mu-form-group">
                                     <label style={{ display: 'flex', justifyContent: 'space-between' }}>
                                         <span>Password *</span>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: 'var(--primary)', cursor: 'pointer', fontWeight: 'normal' }}>
-                                            <input type="checkbox" checked={autoGeneratePassword} onChange={(e) => setAutoGeneratePassword(e.target.checked)} style={{ margin: 0 }} /> Auto-generate
-                                        </label>
+                                        <div className="flex items-center gap-2">
+                                            <input 
+                                                type="checkbox" 
+                                                id="autoGen"
+                                                checked={autoGeneratePassword}
+                                                onChange={(e) => {
+                                                    const checked = e.target.checked;
+                                                    setAutoGeneratePassword(checked);
+                                                    if (checked) {
+                                                        const generated = Math.random().toString(36).slice(-8) + "!";
+                                                        setNewUserPassword(generated);
+                                                    } else {
+                                                        setNewUserPassword(''); // Clear password if unchecking auto-generate
+                                                    }
+                                                }}
+                                            />
+                                            <label htmlFor="autoGen" className="mu-checkbox-label">Auto-generate</label>
+                                        </div>
                                     </label>
                                     <input type="text" className="input-field" placeholder="Minimum 6 characters" value={newUserPassword} onChange={(e) => setNewUserPassword(e.target.value)} required={!autoGeneratePassword} disabled={autoGeneratePassword} minLength="6" />
                                 </div>
@@ -532,16 +602,16 @@ const ManageUsers = () => {
                                 <div className="mu-form-group">
                                     <label style={{ color: 'var(--error)' }}>Hazard Danger: Role Access</label>
                                     <select className="input-field" style={{ borderColor: 'var(--error)' }} value={editUserRole} onChange={(e) => setEditUserRole(e.target.value)} disabled={selectedUser.role === 'admin'}>
-                                        <option value="student">Demote to Student</option>
-                                        <option value="faculty">Promote to Faculty</option>
-                                        {selectedUser.role === 'admin' && <option value="admin">Administrator Override</option>}
+                                        <option value="student">Student</option>
+                                        <option value="faculty">Faculty</option>
+                                        <option value="admin">Admin</option>
                                     </select>
                                 </div>
-                                <div className="mu-modal-footer">
-                                    <button type="button" onClick={() => setIsEditModalOpen(false)} className="btn btn-outline">Discard</button>
-                                    <button type="submit" className="btn btn-primary">Save Changes</button>
-                                </div>
                             </form>
+                        </div>
+                        <div className="mu-modal-footer">
+                            <button type="button" onClick={() => setIsEditModalOpen(false)} className="btn btn-outline">Cancel</button>
+                            <button onClick={handleEditSubmit} className="btn btn-primary">Save Changes</button>
                         </div>
                     </div>
                 </div>
@@ -567,7 +637,7 @@ const ManageUsers = () => {
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 

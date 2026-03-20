@@ -78,7 +78,7 @@ exports.loginUser = async (req, res) => {
 // 🔹 Create Faculty (Admin Only)
 exports.createFaculty = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -89,7 +89,7 @@ exports.createFaculty = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = await User.create({
-      name: "Faculty Member",
+      name: name || "Faculty Member",
       email,
       password: hashedPassword,
       role: "faculty"
@@ -97,6 +97,7 @@ exports.createFaculty = async (req, res) => {
 
     res.status(201).json({
       _id: user._id,
+      name: user.name,
       email: user.email,
       role: user.role
     });
@@ -108,7 +109,7 @@ exports.createFaculty = async (req, res) => {
 // 🔹 Create Student (Admin or Faculty)
 exports.createStudent = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -119,7 +120,7 @@ exports.createStudent = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = await User.create({
-      name: "Student",
+      name: name || "Student",
       email,
       password: hashedPassword,
       role: "student"
@@ -127,6 +128,7 @@ exports.createStudent = async (req, res) => {
 
     res.status(201).json({
       _id: user._id,
+      name: user.name,
       email: user.email,
       role: user.role
     });

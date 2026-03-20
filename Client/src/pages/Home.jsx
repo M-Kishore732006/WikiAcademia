@@ -9,9 +9,9 @@ const Home = () => {
     return (
         <div className="home-page">
             {/* Hero Section */}
-        <section className="bg-surface py-20 border-b border-gray-200">
+        <section className="bg-surface py-16 border-b border-gray-200">
             <div className="container text-center">
-                <h1 className="text-4xl md:text-6xl font-extrabold text-gradient mb-6" style={{ fontSize: 'clamp(1.6rem, 6vw, 3.75rem)' }}>
+                <h1 className="text-4xl md:text-5xl font-extrabold text-gradient mb-6" style={{ fontSize: 'clamp(1.5rem, 5.5vw, 3.25rem)' }}>
                     Digital Academic Knowledge Repository
                 </h1>
                 <p className="text-xl text-secondary mb-8 max-w-2xl mx-auto" style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)' }}>
