@@ -963,7 +963,7 @@ p {
   background-color: transparent;
   border: 1px solid var(--border);
   color: var(--text-main);
-  padding: 8px 14px;
+  padding: 0.73rem 1rem; /* Match input-field height */
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -973,6 +973,8 @@ p {
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: var(--shadow-sm);
+  height: 42px; /* Force consistent height */
+  box-sizing: border-box;
 }
 
 .sort-btn-trigger:hover {
@@ -1012,4 +1014,46 @@ p {
 /* Table Utilities */
 .align-middle {
   vertical-align: middle;
+}
+
+.pl-10 {
+  padding-left: 2.5rem !important;
+}
+
+/* Disciplined height and alignment for Browse page filters */
+.browse-filter-control {
+  height: 42px !important;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.browse-filter-control .input-field,
+.browse-filter-control select.input-field,
+.browse-filter-control .sort-btn-trigger {
+  height: 42px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  display: flex;
+  align-items: center;
+}
+
+/* Ensure the button uses flex internally but the input uses normal display */
+.browse-filter-control input.input-field {
+  display: block;
+  line-height: normal; /* Browser default for text inputs */
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.browse-filter-control select.input-field {
+  display: block;
+  padding-top: 0;
+  padding-bottom: 0;
+  appearance: none; /* Reset for consistency */
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.5rem;
 }

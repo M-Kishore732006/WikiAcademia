@@ -163,9 +163,16 @@ const FacultyUploads = () => {
                 <div className="flex flex-wrap items-center gap-3 mobile-stack" style={{ width: '100%' }}>
                     
                     {/* Search Bar */}
-                    <div className="relative flex items-center w-full md:w-auto md:flex-1">
+                    <div className="relative w-full md:w-auto md:flex-1" style={{ height: '42px' }}>
                         <svg 
-                            className="absolute left-3 text-gray-400 pointer-events-none"
+                            className="text-gray-400 pointer-events-none"
+                            style={{ 
+                                position: 'absolute',
+                                left: '12px',
+                                top: '50%', 
+                                transform: 'translateY(-50%)', 
+                                zIndex: 10 
+                            }}
                             width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                         >
                             <circle cx="11" cy="11" r="8"></circle>
@@ -174,16 +181,17 @@ const FacultyUploads = () => {
                         <input
                             type="text"
                             placeholder="Search their materials..."
-                            className="input-field pl-10 w-full"
+                            className="input-field pl-10 w-full h-full"
+                            style={{ margin: 0 }}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
 
                     {/* Category Dropdown */}
-                    <div className="w-full md:w-auto md:flex-initial">
+                    <div className="browse-filter-control w-full md:w-auto md:flex-initial">
                         <select
-                            className="input-field w-full md:min-w-[180px]"
+                            className="input-field w-full md:min-w-[180px] h-full"
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.target.value)}
                         >
@@ -195,9 +203,9 @@ const FacultyUploads = () => {
                     </div>
                             
                     {/* Sort Container */}
-                    <div className="relative shrink-0 sort-container" style={{ position: 'relative' }}>
+                    <div className="relative shrink-0 sort-container browse-filter-control">
                         <button 
-                            className="sort-btn-trigger"
+                            className="sort-btn-trigger h-full"
                             onClick={() => setShowSortMenu(!showSortMenu)}
                             title={`Current Sort: ${getSortLabel()}`}
                         >

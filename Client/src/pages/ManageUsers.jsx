@@ -641,7 +641,7 @@ const ManageUsers = () => {
                                 You are about to permanently delete <strong>{selectedUser.email}</strong>. This operation will wipe their data off the database and cannot be reversed.
                             </p>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                <button onClick={handleDeleteConfirm} className="btn" style={{ background: '#ef4444', color: 'white', width: '100%', border: 'none' }}>Yes, delete user</button>
+                                <button onClick={handleDeleteConfirm} className="btn mu-btn-danger" style={{ width: '100%' }}>Yes, delete user</button>
                                 <button onClick={() => setIsDeleteModalOpen(false)} className="btn btn-outline" style={{ width: '100%' }}>Cancel</button>
                             </div>
                         </div>
