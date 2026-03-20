@@ -257,6 +257,39 @@
     font-size: 0.875rem;
     font-weight: 500;
 }
+
+.mu-form-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.mu-form-label-row label {
+    margin-bottom: 0;
+}
+
+.mu-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.mu-checkbox-wrapper input[type="checkbox"] {
+    width: 0.9rem;
+    height: 0.9rem;
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+.mu-checkbox-wrapper span {
+    font-size: 0.825rem;
+    font-weight: 500;
+    color: var(--text-main);
+}
 .mu-form-group input, .mu-form-group select {
     margin-bottom: 0;
 }

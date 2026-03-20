@@ -547,27 +547,38 @@ const ManageUsers = () => {
                                     </select>
                                 </div>
                                 <div className="mu-form-group">
-                                    <label style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <span>Password *</span>
-                                        <div className="flex items-center gap-2">
+                                    <div className="mu-form-label-row">
+                                        <label>Password *</label>
+                                        <div className="mu-checkbox-wrapper" onClick={() => {
+                                            const newVal = !autoGeneratePassword;
+                                            setAutoGeneratePassword(newVal);
+                                            if (newVal) {
+                                                const generated = Math.random().toString(36).slice(-8) + "!";
+                                                setNewUserPassword(generated);
+                                            } else {
+                                                setNewUserPassword('');
+                                            }
+                                        }}>
                                             <input 
                                                 type="checkbox" 
                                                 id="autoGen"
                                                 checked={autoGeneratePassword}
                                                 onChange={(e) => {
+                                                    // Stop propagation so the div's onClick doesn't double-fire
+                                                    e.stopPropagation();
                                                     const checked = e.target.checked;
                                                     setAutoGeneratePassword(checked);
                                                     if (checked) {
                                                         const generated = Math.random().toString(36).slice(-8) + "!";
                                                         setNewUserPassword(generated);
                                                     } else {
-                                                        setNewUserPassword(''); // Clear password if unchecking auto-generate
+                                                        setNewUserPassword('');
                                                     }
                                                 }}
                                             />
-                                            <label htmlFor="autoGen" className="mu-checkbox-label">Auto-generate</label>
+                                            <span>Auto-generate</span>
                                         </div>
-                                    </label>
+                                    </div>
                                     <input type="text" className="input-field" placeholder="Minimum 6 characters" value={newUserPassword} onChange={(e) => setNewUserPassword(e.target.value)} required={!autoGeneratePassword} disabled={autoGeneratePassword} minLength="6" />
                                 </div>
                                 <div className="mu-modal-footer">
