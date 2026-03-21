@@ -4,7 +4,7 @@ import './ManageUsers.css'; // Mapped vanilla CSS file
 import { 
     User, Trash2, KeyRound, Plus, Search, Filter, 
     Edit2, ShieldAlert, GraduationCap, X, FolderOpen,
-    UserPlus, Shield, Copy, CheckCircle
+    UserPlus, Shield, Copy, CheckCircle, Eye, EyeOff
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -25,6 +25,7 @@ const ManageUsers = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isResetModalOpen, setIsResetModalOpen] = useState(false);
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
     const [createdUserInfo, setCreatedUserInfo] = useState(null);
 
@@ -35,10 +36,15 @@ const ManageUsers = () => {
     const [newUserRole, setNewUserRole] = useState('student');
     const [newUserName, setNewUserName] = useState('');
     const [autoGeneratePassword, setAutoGeneratePassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
 
     const [editUserName, setEditUserName] = useState('');
     const [editUserEmail, setEditUserEmail] = useState('');
     const [editUserRole, setEditUserRole] = useState('');
+
+    const [resetUserPassword, setResetUserPassword] = useState('');
+    const [resetAutoGeneratePassword, setResetAutoGeneratePassword] = useState(false);
+    const [showResetPassword, setShowResetPassword] = useState(false);
 
     useEffect(() => {
         fetchUsers();
@@ -81,16 +87,37 @@ const ManageUsers = () => {
         }
     };
 
-    const handleResetPassword = async (userId) => {
-        const newPassword = window.prompt("Enter new password for this user (minimum 6 characters):");
-        if (!newPassword || newPassword.length < 6) {
-            if (newPassword !== null) alert("Password must be at least 6 characters.");
+    const handleResetPassword = (user) => {
+        setSelectedUser(user);
+        setResetUserPassword('');
+        setResetAutoGeneratePassword(false);
+        setShowResetPassword(false);
+        setIsResetModalOpen(true);
+    };
+
+    const handleResetConfirm = async (e) => {
+        e.preventDefault();
+        if (!resetUserPassword || resetUserPassword.length < 6) {
+            showToast("Password must be at least 6 characters.", 'error');
             return;
         }
 
         try {
-            await api.put(`/auth/reset-password/${userId}`, { password: newPassword });
-            showToast('Password reset successfully');
+            await api.put(`/auth/reset-password/${selectedUser._id}`, { password: resetUserPassword });
+            
+            if (resetAutoGeneratePassword) {
+                setCreatedUserInfo({
+                    name: selectedUser.name || "User",
+                    email: selectedUser.email,
+                    password: resetUserPassword,
+                    role: selectedUser.role
+                });
+                setIsResetModalOpen(false);
+                setIsSuccessModalOpen(true);
+            } else {
+                showToast('Password reset successfully');
+                setIsResetModalOpen(false);
+            }
         } catch (error) {
             showToast(error.response?.data?.message || 'Failed to reset password', 'error');
         }
@@ -375,7 +402,7 @@ const ManageUsers = () => {
                                                     <Edit2 size={18} />
                                                 </button>
                                                 <button 
-                                                    onClick={() => handleResetPassword(u._id)}
+                                                    onClick={() => handleResetPassword(u)}
                                                     className="reset"
                                                     title="Force Password Reset"
                                                 >
@@ -430,7 +457,7 @@ const ManageUsers = () => {
                                                 title="Edit"
                                             ><Edit2 size={16} /></button>
                                             <button 
-                                                onClick={() => handleResetPassword(u._id)}
+                                                onClick={() => handleResetPassword(u)}
                                                 style={{ background: 'rgba(245,158,11,0.1)', color:'#f59e0b', border:'none', borderRadius:'0.4rem', padding:'0.4rem', cursor:'pointer', display:'flex', alignItems:'center' }}
                                                 title="Reset Password"
                                             ><KeyRound size={16} /></button>
@@ -571,6 +598,7 @@ const ManageUsers = () => {
                                                     if (checked) {
                                                         const generated = Math.random().toString(36).slice(-8) + "!";
                                                         setNewUserPassword(generated);
+                                                        setShowNewPassword(true); // Force show when autogenerating
                                                     } else {
                                                         setNewUserPassword('');
                                                     }
@@ -579,7 +607,27 @@ const ManageUsers = () => {
                                             <span>Auto-generate</span>
                                         </div>
                                     </div>
-                                    <input type="text" className="input-field" placeholder="Minimum 6 characters" value={newUserPassword} onChange={(e) => setNewUserPassword(e.target.value)} required={!autoGeneratePassword} disabled={autoGeneratePassword} minLength="6" />
+                                    <div className="relative">
+                                        <input 
+                                            type={showNewPassword ? "text" : "password"} 
+                                            className="input-field w-full pr-10" 
+                                            placeholder="Minimum 6 characters" 
+                                            value={newUserPassword} 
+                                            onChange={(e) => setNewUserPassword(e.target.value)} 
+                                            required={!autoGeneratePassword} 
+                                            disabled={autoGeneratePassword} 
+                                            minLength="6" 
+                                        />
+                                        <button 
+                                            type="button"
+                                            onClick={() => setShowNewPassword(!showNewPassword)}
+                                            className="absolute right-3 top-half translate-y-half text-secondary hover:text-primary transition-colors border-none bg-transparent cursor-pointer p-1"
+                                            title={showNewPassword ? "Hide Password" : "Show Password"}
+                                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                        >
+                                            {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="mu-modal-footer">
                                     <button type="button" onClick={() => setIsCreateModalOpen(false)} className="btn btn-outline">Cancel</button>
@@ -623,6 +671,83 @@ const ManageUsers = () => {
                         <div className="mu-modal-footer">
                             <button type="button" onClick={() => setIsEditModalOpen(false)} className="btn btn-outline">Cancel</button>
                             <button onClick={handleEditSubmit} className="btn btn-primary">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Reset Password Modal */}
+            {isResetModalOpen && selectedUser && (
+                <div className="mu-modal-overlay">
+                    <div className="mu-modal">
+                        <div className="mu-modal-header">
+                            <h2>Reset User Password</h2>
+                            <button onClick={() => setIsResetModalOpen(false)} className="mu-modal-close"><X size={20} /></button>
+                        </div>
+                        <div className="mu-modal-body">
+                            <p className="text-sm text-secondary mb-4">
+                                Resetting password for: <strong>{selectedUser.email}</strong>
+                            </p>
+                            <form onSubmit={handleResetConfirm}>
+                                <div className="mu-form-group">
+                                    <div className="mu-form-label-row">
+                                        <label>New Password *</label>
+                                        <div className="mu-checkbox-wrapper" onClick={() => {
+                                            const newVal = !resetAutoGeneratePassword;
+                                            setResetAutoGeneratePassword(newVal);
+                                            if (newVal) {
+                                                const generated = Math.random().toString(36).slice(-8) + "!";
+                                                setResetUserPassword(generated);
+                                                setShowResetPassword(true); // Force show when autogenerating
+                                            } else {
+                                                setResetUserPassword('');
+                                            }
+                                        }}>
+                                            <input 
+                                                type="checkbox" 
+                                                checked={resetAutoGeneratePassword}
+                                                onChange={(e) => {
+                                                    e.stopPropagation();
+                                                    const checked = e.target.checked;
+                                                    setResetAutoGeneratePassword(checked);
+                                                    if (checked) {
+                                                        const generated = Math.random().toString(36).slice(-8) + "!";
+                                                        setResetUserPassword(generated);
+                                                    } else {
+                                                        setResetUserPassword('');
+                                                    }
+                                                }}
+                                            />
+                                            <span>Auto-generate</span>
+                                        </div>
+                                    </div>
+                                    <div className="relative">
+                                        <input 
+                                            type={showResetPassword ? "text" : "password"} 
+                                            className="input-field w-full pr-10" 
+                                            placeholder="Minimum 6 characters" 
+                                            value={resetUserPassword} 
+                                            onChange={(e) => setResetUserPassword(e.target.value)} 
+                                            required={!resetAutoGeneratePassword} 
+                                            disabled={resetAutoGeneratePassword} 
+                                            minLength="6" 
+                                        />
+                                        <button 
+                                            type="button"
+                                            onClick={() => setShowResetPassword(!showResetPassword)}
+                                            className="absolute right-3 top-half translate-y-half text-secondary hover:text-primary transition-colors border-none bg-transparent cursor-pointer p-1"
+                                            title={showResetPassword ? "Hide Password" : "Show Password"}
+                                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                        >
+                                            {showResetPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="mu-modal-footer">
+                                    <button type="button" onClick={() => setIsResetModalOpen(false)} className="btn btn-outline">Cancel</button>
+                                    <button type="submit" className="btn btn-primary">Reset Password</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

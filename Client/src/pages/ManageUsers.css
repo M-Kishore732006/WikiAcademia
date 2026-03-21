@@ -302,6 +302,14 @@
     padding: 0 1.5rem 1.5rem 1.5rem;
 }
 
+/* Password Toggle Utilities */
+.relative { position: relative; }
+.absolute { position: absolute; }
+.right-3 { right: 0.75rem; }
+.top-half { top: 50%; }
+.translate-y-half { transform: translateY(-50%); }
+.pr-10 { padding-right: 2.5rem !important; }
+
 .mu-btn-danger {
     background-color: #ef4444 !important;
     color: white !important;
