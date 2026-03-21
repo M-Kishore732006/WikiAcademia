@@ -590,6 +590,14 @@ p {
   position: relative;
 }
 
+.top-1-2 {
+  top: 50%;
+}
+
+.-translate-y-1-2 {
+  transform: translateY(-50%);
+}
+
 /* Missing Utilities */
 .font-bold {
   font-weight: 700;

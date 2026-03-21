@@ -621,7 +621,7 @@ const ManageUsers = () => {
                                         <button 
                                             type="button"
                                             onClick={() => setShowNewPassword(!showNewPassword)}
-                                            className="absolute right-3 top-half translate-y-half text-secondary hover:text-primary transition-colors border-none bg-transparent cursor-pointer p-1"
+                                            className="absolute right-3 top-1-2 -translate-y-1-2 text-secondary hover:text-primary transition-colors border-none bg-transparent cursor-pointer p-1"
                                             title={showNewPassword ? "Hide Password" : "Show Password"}
                                             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                         >
@@ -735,7 +735,7 @@ const ManageUsers = () => {
                                         <button 
                                             type="button"
                                             onClick={() => setShowResetPassword(!showResetPassword)}
-                                            className="absolute right-3 top-half translate-y-half text-secondary hover:text-primary transition-colors border-none bg-transparent cursor-pointer p-1"
+                                            className="absolute right-3 top-1-2 -translate-y-1-2 text-secondary hover:text-primary transition-colors border-none bg-transparent cursor-pointer p-1"
                                             title={showResetPassword ? "Hide Password" : "Show Password"}
                                             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                         >

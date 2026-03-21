@@ -39,21 +39,23 @@ const Login = () => {
                     </div>
                     <div className="relative">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Password</label>
-                        <input
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Enter your password"
-                            className="input-field"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                        <button
-                            type="button"
-                            className="absolute right-3 top-[32px] text-gray-500 dark:text-gray-400 hover:text-primary bg-transparent border-none cursor-pointer"
-                            onClick={() => setShowPassword(!showPassword)}
-                        >
-                            {showPassword ? "Hide" : "Show"}
-                        </button>
+                        <div className="relative">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Enter your password"
+                                className="input-field"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                            <button
+                                type="button"
+                                className="absolute right-3 top-1-2 -translate-y-1-2 text-gray-500 dark:text-gray-400 hover:text-primary bg-transparent border-none cursor-pointer"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? "Hide" : "Show"}
+                            </button>
+                        </div>
                     </div>
                     <button type="submit" className="btn btn-primary w-full py-3 mt-2">
                         Login
