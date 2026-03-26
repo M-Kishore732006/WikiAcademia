@@ -120,9 +120,9 @@ const getDocuments = async (req, res) => {
 
         let query = {};
 
-        // Visibility filter: unauthenticated users only see public or legacy docs
+        // Visibility filter: Private docs are only visible to faculty and admin
         const requestUser = await tryGetUser(req);
-        if (!requestUser) {
+        if (!requestUser || requestUser.role === 'student') {
             query.visibility = { $ne: 'private' };
         }
 
@@ -201,11 +201,14 @@ const downloadDocument = async (req, res) => {
         const document = await Document.findById(req.params.id);
 
         if (document) {
-            // Gate private documents behind authentication
+            // Gate private documents behind authentication and role
             if (document.visibility === 'private') {
                 const requestUser = await tryGetUser(req);
                 if (!requestUser) {
                     return res.status(401).json({ message: "Please log in to access this document" });
+                }
+                if (requestUser.role === 'student') {
+                    return res.status(403).json({ message: "Not authorized to access private documents" });
                 }
             }
 
