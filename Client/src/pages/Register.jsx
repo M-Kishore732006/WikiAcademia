@@ -17,7 +17,7 @@ const Register = () => {
             await register(name, email, password, 'student');
             navigate('/');
         } catch (err) {
-            setError(err.response?.data?.message || 'Registration failed');
+            setError(err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || 'Registration failed');
         }
     };
 
@@ -59,6 +59,7 @@ const Register = () => {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
+                                minLength={6}
                             />
                             <button
                                 type="button"
