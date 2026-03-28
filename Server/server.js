@@ -50,11 +50,11 @@ app.get("/", (req, res) => {
 // 🔹 Test insert function (temporary verification)
 const bcrypt = require("bcryptjs"); // Import bcrypt for hashing
 
-// 🔹 Test insert function (temporary verification)
+// 🔹 Test insert function (creates initial admin)
 const testInsert = async () => {
   try {
-    const email = "test@example.com";
-    const password = "123456";
+    const email = "admin@gmail.com";
+    const password = "732006";
 
     const existingUser = await User.findOne({ email });
 
@@ -63,29 +63,24 @@ const testInsert = async () => {
       const hashedPassword = await bcrypt.hash(password, salt);
 
       const user = await User.create({
-        name: "Test User",
+        name: "System Admin",
         email,
         password: hashedPassword,
-        role: "student"
+        role: "admin"
       });
 
-      console.log("Test user created:", user.email);
+      console.log("Initial Admin user created:", user.email);
     } else {
-      // Check if password is valid (hashed)
-      const isMatch = await bcrypt.compare(password, existingUser.password);
-      if (!isMatch) {
-        console.log("Updating test user password to be hashed...");
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-        existingUser.password = hashedPassword;
+      // Ensure the user remains an admin and has the correct password layout
+      if (existingUser.role !== "admin") {
+        existingUser.role = "admin";
         await existingUser.save();
-        console.log("Test user password updated.");
-      } else {
-        console.log("Test user already exists and password is valid.");
+        console.log("Updated existing test user to Admin role.");
       }
+      console.log("Admin user is ready.");
     }
   } catch (error) {
-    console.error("Error inserting test user:", error.message);
+    console.error("Error inserting test admin user:", error.message);
   }
 };
 
