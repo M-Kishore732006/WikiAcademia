@@ -47,6 +47,10 @@ const documentSchema = new mongoose.Schema(
     downloads: {
       type: Number,
       default: 0
+    },
+    summary: {
+      type: [String],
+      default: []
     }
   },
   { timestamps: true }

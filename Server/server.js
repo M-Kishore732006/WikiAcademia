@@ -14,6 +14,8 @@ const User = require("./models/user");
 const authRoutes = require("./routes/authRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const documentRoutes = require("./routes/documentRoutes");
+const aiRoutes = require("./routes/aiRoutes");
+const commentRoutes = require("./routes/commentRoutes");
 const helmet = require("helmet");
 const morgan = require("morgan");
 
@@ -40,7 +42,8 @@ app.use(morgan('dev')); // Also log to console
 app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/documents", documentRoutes);
-
+app.use("/api/ai", aiRoutes);
+app.use("/api/comments", commentRoutes);
 
 // 🔹 Basic route
 app.get("/", (req, res) => {

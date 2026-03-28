@@ -1,6 +1,8 @@
 import { useState, useEffect, useContext } from 'react';
-import { Trash2, Edit2, X, Lock } from 'lucide-react';
+import { Trash2, Edit2, X, Lock, Sparkles, MessageCircle } from 'lucide-react';
 import api from '../utils/api';
+import AIChatModal from '../components/AIChatModal';
+import DiscussionModal from '../components/DiscussionModal';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 
@@ -16,6 +18,8 @@ const Browse = () => {
     const navigate = useNavigate();
 
     const [editingDoc, setEditingDoc] = useState(null);
+    const [activeAiDoc, setActiveAiDoc] = useState(null);
+    const [activeDiscussionDoc, setActiveDiscussionDoc] = useState(null);
     const [editFormData, setEditFormData] = useState({
         title: '',
         description: '',
@@ -288,7 +292,29 @@ const Browse = () => {
                             </div>
                         </div>
 
-                        <div className="mt-4 pt-5 border-t border-gray-100 flex justify-between items-end">
+                        <div className="mt-4 flex gap-2 w-full pt-3">
+                            {doc.materialType === 'File' && (
+                                <button
+                                    onClick={() => setActiveAiDoc({ id: doc._id, title: doc.title })}
+                                    className="flex-1 btn text-xs py-2 flex items-center justify-center gap-1 font-bold shadow-sm transition-all"
+                                    style={{ backgroundColor: 'rgba(0, 198, 255, 0.1)', color: 'var(--primary)', border: '1px solid rgba(0, 198, 255, 0.2)' }}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 198, 255, 0.2)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 198, 255, 0.1)'}
+                                >
+                                    <Sparkles size={14} /> AI Study
+                                </button>
+                            )}
+                            <button
+                                onClick={() => setActiveDiscussionDoc({ id: doc._id, title: doc.title })}
+                                className="flex-1 btn text-xs py-2 flex items-center justify-center gap-1 font-bold shadow-sm transition-all"
+                                style={{ backgroundColor: 'var(--background)', color: 'var(--text-main)', border: '1px solid var(--border)' }}
+                                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--text-muted)'; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--background)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
+                            >
+                                <MessageCircle size={14} /> Discuss
+                            </button>
+                        </div>
+                        <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-end">
                             <small className="text-gray-400 dark:text-gray-500 text-xs mb-1">By {doc.uploadedBy?.name || 'Unknown'}</small>
                             <div className="flex gap-2 items-center mt-2">
                                 {user && (user._id === doc.uploadedBy?._id || user.role === 'admin') && (
@@ -326,6 +352,20 @@ const Browse = () => {
                     <p className="text-gray-500 dark:text-gray-400 text-lg">No documents found matching your criteria.</p>
                 </div>
             )}
+
+            <AIChatModal 
+                isOpen={!!activeAiDoc} 
+                onClose={() => setActiveAiDoc(null)} 
+                documentId={activeAiDoc?.id}
+                title={activeAiDoc?.title}
+            />
+
+            <DiscussionModal 
+                isOpen={!!activeDiscussionDoc} 
+                onClose={() => setActiveDiscussionDoc(null)} 
+                documentId={activeDiscussionDoc?.id}
+                title={activeDiscussionDoc?.title}
+            />
 
             {editingDoc && (
                 <div className="modal-overlay">
