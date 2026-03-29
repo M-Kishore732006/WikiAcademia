@@ -12,10 +12,10 @@ const Home = () => {
         <section className="bg-surface py-16 border-b border-gray-200">
             <div className="container text-center">
                 <h1 className="text-4xl md:text-5xl font-extrabold text-gradient mb-6" style={{ fontSize: 'clamp(1.5rem, 5.5vw, 3.25rem)' }}>
-                    Digital Academic Knowledge Repository
+                    Your AI-Powered Academic Knowledge Hub
                 </h1>
                 <p className="text-xl text-secondary mb-8 max-w-2xl mx-auto" style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)' }}>
-                    Access a vast collection of study materials, lecture notes, and research papers via our centralized platform.
+                    Browse study materials, lecture notes, and research papers — then let our built-in AI summarize them and answer your questions instantly.
                 </p>
                 <div className="flex flex-col sm:flex-row justify-center gap-4" style={{ alignItems: 'center' }}>
                     <Link to="/browse" className="btn btn-primary text-lg px-8 py-3 no-underline text-white w-full sm:w-auto" style={{ maxWidth: '280px' }}>
@@ -45,9 +45,9 @@ const Home = () => {
                             </p>
                         </Link>
 
-                        {/* Feature 2: WikAI Placeholder */}
-                        <div 
-                            onClick={() => alert('WikAI Chatbot coming soon! This will act as our intelligent AI assistant to help you read and query documents.')}
+                        {/* Feature 2: WikAI Assistant - Now Live */}
+                        <Link
+                            to="/browse"
                             className="card text-center hover:shadow-lg transition-shadow cursor-pointer block text-inherit no-underline" style={{ color: 'inherit' }}
                         >
                             <div 
@@ -58,9 +58,9 @@ const Home = () => {
                             </div>
                             <h3 className="text-xl font-bold mb-2">WikAI Assistant</h3>
                             <p className="text-secondary">
-                                An intelligent AI chatbot that reads your uploaded materials and answers your questions. (Coming Soon)
+                                AI-powered study assistant that reads your documents, extracts key concepts, and answers your questions in real time.
                             </p>
-                        </div>
+                        </Link>
 
                         {/* Feature 3 */}
                         <div 
