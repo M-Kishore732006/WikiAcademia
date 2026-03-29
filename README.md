@@ -1,6 +1,6 @@
 # WikiAcademia
 
-WikiAcademia is an AI-powered collaborative learning platform designed to transform unstructured lecture materials into structured, interactive knowledge while enabling meaningful peer-to-peer learning.
+WikiAcademia is an AI-powered collaborative learning platform designed to transform unstructured lecture materials into structured, interactive Notes while enabling meaningful peer-to-peer learning.
 
 ## 🚀 Key Features
 
