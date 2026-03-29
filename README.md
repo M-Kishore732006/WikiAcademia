@@ -1,20 +1,47 @@
 # WikiAcademia
 
-A comprehensive full-stack web application designed for academic institutions to manage, share, and browse educational resources efficiently. This platform allows faculty members to upload study materials (PDFs, PPTXs) and enables students to access them easily.
+WikiAcademia is an AI-powered collaborative learning platform designed to transform unstructured lecture materials into structured, interactive knowledge while enabling meaningful peer-to-peer learning..
 
 ## 🚀 Key Features
 
-- **User Authentication**: Secure Login and Registration system for Students and Faculty members.
-- **Faculty Dashboard**: Dedicated interface for faculty to upload and manage documents.
-- **Document Management**: Support for multiple file formats (PDF, PPTX) with secure storage via Cloudinary.
-- **Browse & Search**: Categorized browsing of academic resources with search and filter capabilities.
-- **User Management**: Admin-level control to manage user roles and permissions.
-- **Responsive Design**: Fully responsive UI/UX built with React and Tailwind CSS.
-
+- **AI-Powered Content Structuring**: Automatically converts uploaded lecture materials into structured summaries, key concepts, and simplified explanations.  
+- **Revision Flashcards**: Generates quick flashcards for efficient revision and concept reinforcement.  
+- **Context-Aware AI Q&A**: Allows students to ask questions and receive answers based on the uploaded material.    
+- **Intelligent Peer Matching**: Connects learners with relevant helpers studying the same material for targeted collaboration.  
+- **Smart Doubt Visibility**: Displays the latest questions from learners to help peers quickly identify and respond to doubts.  
+- **Material-Based Learning Flow**: Each document acts as a complete learning unit with AI insights and collaborative features.  
+- **Full-Stack Deployment**: Built using React (Vercel), Node.js & Express (Render), and MongoDB Atlas.  
+- **Responsive UI/UX**: Clean and user-friendly interface designed for seamless navigation and interaction.
+    
 ## 🚀 Project Demo
 
 🎥 Watch the full demo here:  
 👉 https://www.youtube.com/watch?v=5lLhAdehWMU
+
+## 🔑 Demo Access
+
+To explore the platform, you can use the following sample accounts:
+
+### 👨‍🎓 Student Login
+- **Email**: teststudent@gmail  
+- **Password**: teststudent
+-**note**: All self-registered accounts are created as Students.
+
+### 👨‍🏫 Faculty Login
+- **Email**: test@example.com
+- **Password**: 123456
+
+###   Admin Login
+-**Email**: viceadmin@gmail.com
+-**password**: IIITDM
+
+## 🌐 Live Demo
+
+👉(https://wiki-academia.vercel.app/)
+
+> ⚠️ Note: These are demo accounts for evaluation purposes only.
+
+---
 
 ## 🛠️ Tech Stack
 
@@ -61,8 +88,8 @@ DigitalAcademicRepository/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/M-Kishore732006/digital-academic-repository.git
-cd digital-academic-repository
+git clone https://github.com/M-Kishore732006/WikiAcademia.git
+cd WikiAcademia
 ```
 
 ### 2. Backend Setup
@@ -82,6 +109,7 @@ cd digital-academic-repository
    CLOUDINARY_CLOUD_NAME=your_cloud_name
    CLOUDINARY_API_KEY=your_api_key
    CLOUDINARY_API_SECRET=your_api_secret
+   GROQ_API_KEY=your_Groq_api_key
    FRONTEND_URL=http://localhost:5173
    ```
 4. Start the server:
