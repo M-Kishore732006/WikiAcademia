@@ -49,8 +49,8 @@ const documentSchema = new mongoose.Schema(
       default: 0
     },
     summary: {
-      type: [String],
-      default: []
+      type: mongoose.Schema.Types.Mixed,
+      default: null
     }
   },
   { timestamps: true }

@@ -17,6 +17,7 @@ const DiscussionModal = ({ isOpen, onClose, documentId, title }) => {
     const [replyingTo, setReplyingTo] = useState(null);
     const [replyContent, setReplyContent] = useState('');
     const [expandedReplies, setExpandedReplies] = useState({});
+    const [sortBy, setSortBy] = useState('top');
     const { user } = useContext(AuthContext);
 
     useEffect(() => {
@@ -154,17 +155,40 @@ const DiscussionModal = ({ isOpen, onClose, documentId, title }) => {
 
     return (
         <div className="modal-overlay" style={{ zIndex: 10000 }}>
-            <div className="modal-content" style={{ maxWidth: '650px', padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '85vh', backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
+            <div className="modal-content" style={{ 
+                maxWidth: '95vw', 
+                width: '1400px',
+                height: '95vh',
+                padding: '0', 
+                overflow: 'hidden', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                backgroundColor: 'var(--surface)', 
+                borderColor: 'var(--border)' 
+            }}>
                 
                 {/* Header */}
                 <div className="flex justify-between items-center shrink-0" style={{ padding: '1.25rem', borderBottom: '1px solid var(--border)', backgroundColor: 'var(--background)' }}>
                     <div>
                         <h2 className="text-lg font-bold flex items-center gap-2" style={{ color: 'var(--text-main)', margin: 0 }}>
-                            <MessageCircle size={20} style={{ color: 'var(--primary)' }} /> Discussions & Q&A
+                            <MessageCircle size={20} style={{ color: 'var(--primary)' }} /> Discussion Page
                         </h2>
-                        <p className="text-xs truncate" style={{ color: 'var(--text-muted)', maxWidth: '400px', margin: '0.25rem 0 0 0' }}>Doc: {title}</p>
+                        <p className="text-xs truncate" style={{ color: 'var(--text-muted)', maxWidth: '250px', margin: '0.25rem 0 0 0' }}>Doc: {title}</p>
                     </div>
-                    <button onClick={onClose} className="btn-close-red"><X size={20} /></button>
+                    <div className="flex items-center gap-3">
+                        <select 
+                            className="input-field py-1.5 px-3 text-xs m-0 font-semibold shadow-sm"
+                            style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)', borderRadius: '0.5rem', appearance: 'none' }}
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                        >
+                            <option value="top">🏅 Top Rated</option>
+                            <option value="lowest">📉 Lowest Rated</option>
+                            <option value="newest">🕒 Newest First</option>
+                            <option value="oldest">🕰️ Oldest First</option>
+                        </select>
+                        <button onClick={onClose} className="btn-close-red"><X size={20} /></button>
+                    </div>
                 </div>
 
                 {/* Comments List */}
@@ -177,8 +201,31 @@ const DiscussionModal = ({ isOpen, onClose, documentId, title }) => {
                             <p className="text-sm" style={{ color: 'var(--text-muted)', margin: 0 }}>No discussions yet. Be the first to ask a question!</p>
                         </div>
                     ) : (
-                        comments.map(comment => (
-                            <div key={comment._id} className="flex gap-3 relative" style={{ padding: '1rem 0', borderBottom: '1px solid var(--border)' }}>
+                        (() => {
+                            const sortedComments = [...comments].sort((a, b) => {
+                                // Pinned always at top
+                                if (a.isPinned && !b.isPinned) return -1;
+                                if (!a.isPinned && b.isPinned) return 1;
+                                
+                                if (sortBy === 'top') {
+                                    if (b.netScore !== a.netScore) return b.netScore - a.netScore;
+                                    return new Date(b.createdAt) - new Date(a.createdAt);
+                                }
+                                if (sortBy === 'lowest') {
+                                    if (a.netScore !== b.netScore) return a.netScore - b.netScore;
+                                    return new Date(b.createdAt) - new Date(a.createdAt);
+                                }
+                                if (sortBy === 'newest') {
+                                    return new Date(b.createdAt) - new Date(a.createdAt);
+                                }
+                                if (sortBy === 'oldest') {
+                                    return new Date(a.createdAt) - new Date(b.createdAt);
+                                }
+                                return 0;
+                            });
+
+                            return sortedComments.map(comment => (
+                                <div key={comment._id} className="flex gap-3 relative" style={{ padding: '1rem 0', borderBottom: '1px solid var(--border)' }}>
                                 
                                 {/* Left Column: Voting */}
                                 <div className="flex flex-col items-center gap-1 shrink-0 pt-1">
@@ -204,7 +251,7 @@ const DiscussionModal = ({ isOpen, onClose, documentId, title }) => {
                                         <div className="flex items-center justify-center shrink-0 rounded-full text-white font-bold" style={{ width: '24px', height: '24px', backgroundColor: getAvatarColor(comment.user?.name), fontSize: '11px' }}>
                                             {comment.user?.name?.charAt(0).toUpperCase() || '?'}
                                         </div>
-                                        <span className="text-sm font-bold flex items-center gap-2 truncate" style={{ color: 'var(--text-main)' }}>
+                                        <span className="text-sm font-bold flex flex-wrap items-center gap-2" style={{ color: 'var(--text-main)' }}>
                                             {comment.user?.name || 'Unknown User'} 
                                             {comment.user?.role === 'faculty' && <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0" style={{ backgroundColor: 'rgba(0, 198, 255, 0.1)', color: 'var(--primary)' }}>Faculty</span>}
                                         </span>
@@ -291,9 +338,9 @@ const DiscussionModal = ({ isOpen, onClose, documentId, title }) => {
                                                                 <div className="flex items-center justify-center shrink-0 rounded-full text-white font-bold" style={{ width: '18px', height: '18px', backgroundColor: getAvatarColor(reply.user?.name), fontSize: '9px' }}>
                                                                     {reply.user?.name?.charAt(0).toUpperCase() || '?'}
                                                                 </div>
-                                                                <span className="text-xs font-bold" style={{ color: 'var(--text-main)' }}>
+                                                                <span className="text-xs font-bold flex flex-wrap items-center gap-1" style={{ color: 'var(--text-main)' }}>
                                                                     {reply.user?.name || 'Unknown'}
-                                                                    {reply.user?.role === 'faculty' && <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold" style={{ marginLeft: '0.5rem', backgroundColor: 'rgba(0, 198, 255, 0.1)', color: 'var(--primary)' }}>Faculty</span>}
+                                                                    {reply.user?.role === 'faculty' && <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold" style={{ marginLeft: '0.25rem', backgroundColor: 'rgba(0, 198, 255, 0.1)', color: 'var(--primary)' }}>Faculty</span>}
                                                                 </span>
                                                             </div>
                                                             <div className="flex items-center gap-2">
@@ -315,7 +362,8 @@ const DiscussionModal = ({ isOpen, onClose, documentId, title }) => {
                                     )}
                                 </div>
                             </div>
-                        ))
+                            ))
+                        })()
                     )}
                 </div>
 

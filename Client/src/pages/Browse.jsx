@@ -358,6 +358,10 @@ const Browse = () => {
                 onClose={() => setActiveAiDoc(null)} 
                 documentId={activeAiDoc?.id}
                 title={activeAiDoc?.title}
+                onGoToDiscussion={() => {
+                    setActiveDiscussionDoc(activeAiDoc);
+                    setActiveAiDoc(null);
+                }}
             />
 
             <DiscussionModal 
