@@ -48,7 +48,7 @@ exports.summarizeDocument = async (req, res) => {
         const safeText = text.substring(0, 15000);
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
         const prompt = `You are an academic assistant. Summarize the following educational material into 4 to 6 concise, highly important concept bullet points. Do not include introductory text, just provide the bullet points starting with a dash (-).\n\nText:\n${safeText}`;
 
