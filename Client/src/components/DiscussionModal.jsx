@@ -192,7 +192,7 @@ const DiscussionModal = ({ isOpen, onClose, documentId, title }) => {
                 </div>
 
                 {/* Comments List */}
-                <div className="flex-1 overflow-y-auto flex flex-col gap-4" style={{ padding: '1.25rem', backgroundColor: 'var(--background)' }}>
+                <div className="flex-1 flex flex-col gap-4" style={{ padding: '1.25rem', backgroundColor: 'var(--background)', overflowY: 'auto' }}>
                     {isLoading ? (
                         <p className="text-center text-sm" style={{ color: 'var(--text-muted)', padding: '2.5rem 0' }}>Loading discussions...</p>
                     ) : comments.length === 0 ? (
