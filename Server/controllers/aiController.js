@@ -48,7 +48,7 @@ exports.summarizeDocument = async (req, res) => {
         const safeText = text.substring(0, 15000);
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
 
         const prompt = `You are an academic assistant. Summarize the following educational material into 4 to 6 concise, highly important concept bullet points. Do not include introductory text, just provide the bullet points starting with a dash (-).\n\nText:\n${safeText}`;
 
@@ -67,7 +67,12 @@ exports.summarizeDocument = async (req, res) => {
         res.json({ summary: bullets });
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const is429 = error.message?.includes("429") || error.status === 429;
+        res.status(is429 ? 429 : 500).json({
+            message: is429
+                ? "AI quota exceeded. Please try again later or contact the administrator."
+                : error.message
+        });
     }
 };
 
@@ -96,7 +101,7 @@ exports.askDocument = async (req, res) => {
         const safeText = text.substring(0, 15000); // Send the first 15k characters for context
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
 
         const prompt = `You are a helpful teaching assistant helping a student understand their study material. Use the provided document text to answer their question accurately. If the answer is not in the text, you can use your general knowledge but mention that it wasn't in the provided document.\n\nDocument Text:\n${safeText}\n\nStudent Question:\n${question}`;
 
@@ -106,6 +111,11 @@ exports.askDocument = async (req, res) => {
         res.json({ answer: response.text().trim() });
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const is429 = error.message?.includes("429") || error.status === 429;
+        res.status(is429 ? 429 : 500).json({
+            message: is429
+                ? "AI quota exceeded. Please try again later or contact the administrator."
+                : error.message
+        });
     }
 };
