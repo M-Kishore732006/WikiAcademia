@@ -1,4 +1,5 @@
 const Comment = require("../models/Comment");
+const PeerRole = require("../models/PeerRole");
 
 // @desc    Get all top-level comments and their replies for a document
 // @route   GET /api/comments/:documentId
@@ -12,9 +13,17 @@ exports.getCommentsByDocument = async (req, res) => {
       .populate("user", "name role") // Populate user details
       .sort({ createdAt: 1 }); // Sort chronologically initially
 
-    if (!allComments) {
+    if (!allComments || allComments.length === 0) {
       return res.status(200).json([]);
     }
+
+    // Lookup peer roles for these users
+    const userIds = [...new Set(allComments.map(c => c.user._id.toString()))];
+    const peerRoles = await PeerRole.find({ documentId, user: { $in: userIds } });
+    const peerRoleMap = {};
+    peerRoles.forEach(pr => {
+      peerRoleMap[pr.user.toString()] = pr.role;
+    });
 
     // Separate top-level comments and replies
     const topLevelComments = allComments.filter((c) => !c.parentComment);
@@ -24,12 +33,18 @@ exports.getCommentsByDocument = async (req, res) => {
     const formattedComments = topLevelComments.map((comment) => {
       const commentObj = comment.toObject();
       commentObj.netScore = comment.upvotes.length - comment.downvotes.length;
+      if (peerRoleMap[commentObj.user._id.toString()]) {
+          commentObj.user.peerRole = peerRoleMap[commentObj.user._id.toString()];
+      }
       
       commentObj.replies = replies
         .filter((r) => r.parentComment.toString() === comment._id.toString())
         .map((r) => {
            const rObj = r.toObject();
            rObj.netScore = r.upvotes.length - r.downvotes.length;
+           if (peerRoleMap[rObj.user._id.toString()]) {
+               rObj.user.peerRole = peerRoleMap[rObj.user._id.toString()];
+           }
            return rObj;
         })
         // Sort replies chronologically
@@ -75,7 +90,13 @@ exports.postComment = async (req, res) => {
     // Populate user before sending back so UI can display name instantly
     await comment.populate("user", "name role");
 
-    res.status(201).json(comment);
+    const currentRole = await PeerRole.findOne({ user: req.user._id, documentId });
+    const commentObj = comment.toObject();
+    if (currentRole) commentObj.user.peerRole = currentRole.role;
+    commentObj.replies = [];
+    commentObj.netScore = 0;
+
+    res.status(201).json(commentObj);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -107,7 +128,12 @@ exports.postReply = async (req, res) => {
 
     await reply.populate("user", "name role");
 
-    res.status(201).json(reply);
+    const currentRole = await PeerRole.findOne({ user: req.user._id, documentId: parentComment.documentId });
+    const replyObj = reply.toObject();
+    if (currentRole) replyObj.user.peerRole = currentRole.role;
+    replyObj.netScore = 0;
+
+    res.status(201).json(replyObj);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
