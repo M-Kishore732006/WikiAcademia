@@ -5,9 +5,8 @@ dns.setServers(["1.1.1.1"]);
 // 🔹 Core imports
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config();
-
 const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, '../../.env') });
 const fs = require("fs");
 const connectDB = require("./config/db");
 const User = require("./models/user");
@@ -16,6 +15,7 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const documentRoutes = require("./routes/documentRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 const commentRoutes = require("./routes/commentRoutes");
+const peerRoutes = require("./routes/peerRoutes");
 const helmet = require("helmet");
 const morgan = require("morgan");
 
@@ -44,6 +44,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/api/peer", peerRoutes);
 
 // 🔹 Basic route
 app.get("/", (req, res) => {

@@ -2,11 +2,29 @@ import { useState, useEffect } from 'react';
 import { X, MessageSquare, List, Send, Loader2 } from 'lucide-react';
 import api from '../utils/api';
 
-const AIChatModal = ({ isOpen, onClose, documentId, title }) => {
+const renderFormattedText = (text) => {
+    if (!text) return null;
+    const paragraphs = text.split(/\n+/).filter(p => p.trim());
+    return paragraphs.map((para, pIdx) => {
+        const parts = para.split(/\*\*/);
+        return (
+            <div key={pIdx} style={{ marginBottom: pIdx === paragraphs.length - 1 ? 0 : '0.6rem', lineHeight: '1.5' }}>
+                {parts.map((str, i) => {
+                    if (i % 2 === 1) {
+                        return <strong key={i} style={{ fontWeight: 'bold', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>{str}</strong>;
+                    }
+                    return <span key={i}>{str}</span>;
+                })}
+            </div>
+        );
+    });
+};
+
+const AIChatModal = ({ isOpen, onClose, documentId, title, onGoToDiscussion }) => {
     const [activeTab, setActiveTab] = useState('summary');
     
     // Summary State
-    const [summary, setSummary] = useState([]);
+    const [summary, setSummary] = useState(null);
     const [isLoadingSummary, setIsLoadingSummary] = useState(false);
     const [summaryError, setSummaryError] = useState('');
 
@@ -17,18 +35,31 @@ const AIChatModal = ({ isOpen, onClose, documentId, title }) => {
     const [input, setInput] = useState('');
     const [isPondering, setIsPondering] = useState(false);
 
+    // Reset state when modal opens or document changes
     useEffect(() => {
-        if (isOpen && activeTab === 'summary' && summary.length === 0 && !summaryError) {
+        if (isOpen) {
+            setSummary(null);
+            setSummaryError('');
+            setIsLoadingSummary(false);
+            setMessages([
+                { role: 'assistant', text: "Hello! I'm your AI study assistant. Ask me anything about this document!" }
+            ]);
+        }
+    }, [isOpen, documentId]);
+
+    useEffect(() => {
+        // Only fetch if open, on summary tab, and NO summary is loaded yet
+        if (isOpen && activeTab === 'summary' && !summary && !summaryError && !isLoadingSummary) {
             fetchSummary();
         }
-    }, [isOpen, activeTab]);
+    }, [isOpen, activeTab, summary, summaryError, documentId]);
 
     const fetchSummary = async () => {
         setIsLoadingSummary(true);
         setSummaryError('');
         try {
             const { data } = await api.post(`/ai/summarize/${documentId}`);
-            setSummary(data.summary || []);
+            setSummary(data.summary || null);
         } catch (error) {
             console.error("Failed to fetch AI summary", error);
             setSummaryError(error.response?.data?.message || 'Failed to generate summary.');
@@ -59,13 +90,13 @@ const AIChatModal = ({ isOpen, onClose, documentId, title }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="modal-overlay" style={{ zIndex: 10000 }}>
-            <div className="modal-content" style={{ maxWidth: '650px', padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '80vh', backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
+        <div className="modal-overlay" style={{ zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="modal-content" style={{ width: '95vw', maxWidth: '1400px', margin: 'auto', padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '95vh', maxHeight: '95vh', backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
                 
                 {/* Header */}
-                <div className="flex justify-between items-center shrink-0" style={{ padding: '1.25rem', borderBottom: '1px solid var(--border)', backgroundColor: 'var(--background)' }}>
+                <div className="flex justify-between items-center shrink-0" style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--border)', backgroundColor: 'var(--background)' }}>
                     <div>
-                        <h2 className="text-lg font-bold flex items-center gap-2" style={{ color: 'var(--primary)', margin: 0 }}>
+                        <h2 className="text-xl font-bold flex items-center gap-2" style={{ color: 'var(--primary)', margin: 0 }}>
                             ✨ AI Study Assistant
                         </h2>
                         <p className="text-xs truncate" style={{ color: 'var(--text-muted)', maxWidth: '400px', margin: '0.25rem 0 0 0' }}>Doc: {title}</p>
@@ -102,11 +133,11 @@ const AIChatModal = ({ isOpen, onClose, documentId, title }) => {
                 </div>
 
                 {/* Content Area */}
-                <div className="flex-1 overflow-y-auto" style={{ padding: '1.25rem', backgroundColor: 'var(--background)' }}>
+                <div style={{ flex: '1 1 auto', overflowY: 'auto', padding: '2rem', backgroundColor: 'var(--background)', minHeight: 0 }}>
                     
                     {/* Summary View */}
                     {activeTab === 'summary' && (
-                        <div className="h-full">
+                        <div>
                             {isLoadingSummary ? (
                                 <div className="flex flex-col items-center justify-center h-full gap-3" style={{ color: 'var(--text-muted)' }}>
                                     <Loader2 className="animate-spin" style={{ color: 'var(--primary)' }} size={32} />
@@ -116,7 +147,9 @@ const AIChatModal = ({ isOpen, onClose, documentId, title }) => {
                                 <div className="rounded-lg text-sm text-center" style={{ padding: '1rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
                                     {summaryError}
                                 </div>
-                            ) : (
+                            ) : !summary ? (
+                                <div className="text-sm text-center" style={{ color: 'var(--text-muted)', paddingTop: '2rem' }}>No summary could be generated.</div>
+                            ) : Array.isArray(summary) ? (
                                 <ul className="flex flex-col gap-3">
                                     {summary.map((point, i) => (
                                         <li key={i} className="flex gap-3 text-sm shadow-sm" style={{ padding: '1rem', borderRadius: '0.75rem', backgroundColor: 'var(--surface)', color: 'var(--text-main)', border: '1px solid var(--border)' }}>
@@ -125,7 +158,109 @@ const AIChatModal = ({ isOpen, onClose, documentId, title }) => {
                                         </li>
                                     ))}
                                 </ul>
+                            ) : (
+                                <div className="flex flex-col gap-6 pb-4">
+                                    <div style={{ padding: '1.25rem', borderRadius: '0.75rem', backgroundColor: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
+                                        <h3 className="text-md font-bold mb-2 flex items-center gap-2" style={{ color: 'var(--primary)' }}>
+                                            📘 Topic
+                                        </h3>
+                                        <p className="text-sm font-semibold" style={{ color: 'var(--text-main)' }}>{summary.topic || "Unknown Topic"}</p>
+                                    </div>
+
+                                    {summary.keyConcepts?.length > 0 && (
+                                        <div>
+                                            <h3 className="text-md font-bold mb-3 flex items-center gap-2" style={{ color: '#0ea5e9' }}>
+                                                🎯 Key Concepts
+                                            </h3>
+                                            <ul className="flex flex-col gap-2">
+                                                {summary.keyConcepts.map((point, i) => (
+                                                    <li key={i} className="flex gap-3 text-sm" style={{ color: 'var(--text-main)' }}>
+                                                        <span style={{ color: '#0ea5e9' }}>•</span>
+                                                        <span>{point}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {summary.simpleExplanation && (
+                                        <div style={{ padding: '1rem', borderRadius: '0.75rem', backgroundColor: 'var(--surface)', border: '1px solid var(--border)' }}>
+                                            <h3 className="text-md font-bold mb-2 flex items-center gap-2" style={{ color: '#8b5cf6' }}>
+                                                💡 Simple Explanation
+                                            </h3>
+                                            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-main)' }}>{summary.simpleExplanation}</p>
+                                        </div>
+                                    )}
+
+                                    {summary.importantPoints?.length > 0 && (
+                                        <div>
+                                            <h3 className="text-md font-bold mb-3 flex items-center gap-2" style={{ color: '#ef4444' }}>
+                                                ⚠️ Important Points
+                                            </h3>
+                                            <ul className="flex flex-col gap-2">
+                                                {summary.importantPoints.map((point, i) => (
+                                                    <li key={i} className="flex gap-3 text-sm" style={{ color: 'var(--text-main)' }}>
+                                                        <span style={{ color: '#ef4444' }}>•</span>
+                                                        <span>{point}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {summary.example && (
+                                        <div style={{ padding: '1rem', borderRadius: '0.75rem', backgroundColor: 'rgba(34, 197, 94, 0.05)', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
+                                            <h3 className="text-md font-bold mb-2 flex items-center gap-2" style={{ color: '#22c55e' }}>
+                                                🔍 Example
+                                            </h3>
+                                            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-main)' }}>{summary.example}</p>
+                                        </div>
+                                    )}
+
+                                    {summary.flashcards?.length > 0 && (
+                                        <div>
+                                            <h3 className="text-md font-bold mb-3 flex items-center gap-2" style={{ color: '#f59e0b' }}>
+                                                🗂️ Revision Flashcards
+                                            </h3>
+                                            <div className="flex flex-col gap-3">
+                                                {summary.flashcards.map((card, i) => (
+                                                    <div key={i} style={{ padding: '1rem', borderRadius: '0.5rem', backgroundColor: 'var(--surface)', border: '1px solid var(--border)' }}>
+                                                        <p className="text-sm font-bold mb-1" style={{ color: 'var(--text-main)' }}>Q: {card.question || card.Q}</p>
+                                                        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>A: {card.answer || card.A}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {summary.difficultyLevel && (
+                                        <div className="flex items-center gap-2 text-sm mt-2">
+                                            <span className="font-bold" style={{ color: 'var(--text-muted)' }}>Difficulty Level:</span>
+                                            <span 
+                                                style={{ 
+                                                    padding: '0.25rem 0.5rem', 
+                                                    borderRadius: '0.25rem', 
+                                                    backgroundColor: summary.difficultyLevel?.toLowerCase() === 'hard' ? 'rgba(239, 68, 68, 0.1)' : summary.difficultyLevel?.toLowerCase() === 'medium' ? 'rgba(234, 179, 8, 0.1)' : 'rgba(34, 197, 94, 0.1)',
+                                                    color: summary.difficultyLevel?.toLowerCase() === 'hard' ? '#ef4444' : summary.difficultyLevel?.toLowerCase() === 'medium' ? '#eab308' : '#22c55e',
+                                                    fontWeight: 'bold'
+                                                }}
+                                            >
+                                                {summary.difficultyLevel}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
                             )}
+
+                            {/* Go to Discussion Shortcut */}
+                            {!isLoadingSummary && summary && !summaryError && (
+                                <div style={{ marginTop: '1.5rem' }}>
+                                    <button className="btn-primary w-full justify-center" onClick={onGoToDiscussion} style={{ padding: '0.75rem', fontSize: '1rem', fontWeight: 'bold' }}>
+                                        💬 Go to Discussion Page
+                                    </button>
+                                </div>
+                            )}
+
                         </div>
                     )}
 
@@ -146,7 +281,7 @@ const AIChatModal = ({ isOpen, onClose, documentId, title }) => {
                                                 boxShadow: 'var(--shadow-sm)'
                                             }}
                                         >
-                                            {msg.text}
+                                            {renderFormattedText(msg.text)}
                                         </div>
                                     </div>
                                 ))}

@@ -1,4 +1,4 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const Groq = require("groq-sdk");
 const Document = require("../models/Document");
 const axios = require("axios");
 const pdfParse = require("pdf-parse");
@@ -29,12 +29,12 @@ exports.summarizeDocument = async (req, res) => {
         if (!document) return res.status(404).json({ message: "Document not found" });
 
         // If a summary already exists, just return it so we don't waste API calls
-        if (document.summary && document.summary.length > 0) {
+        if (document.summary && typeof document.summary === 'object' && Object.keys(document.summary).length > 0) {
             return res.json({ summary: document.summary });
         }
 
-        if (!process.env.GEMINI_API_KEY) {
-            return res.status(500).json({ message: "AI API Key is missing. Please configure GEMINI_API_KEY." });
+        if (!process.env.GROQ_API_KEY) {
+            return res.status(500).json({ message: "AI API Key is missing. Please configure GROQ_API_KEY." });
         }
 
         // We only support Summarizing uploaded Files right now, assuming they are PDFs
@@ -47,26 +47,80 @@ exports.summarizeDocument = async (req, res) => {
         // Limit text length to avoid token limits for basic models (chunking could be added later)
         const safeText = text.substring(0, 15000);
 
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-        const prompt = `You are an academic assistant. Summarize the following educational material into 4 to 6 concise, highly important concept bullet points. Do not include introductory text, just provide the bullet points starting with a dash (-).\n\nText:\n${safeText}`;
+        const prompt = `You are an AI tutor helping students understand academic content quickly and clearly.
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const aiText = response.text();
+Analyze the following lecture notes and generate a structured learning output.
 
-        // Convert the string of bullet points into an array
-        const bullets = aiText.split('\n')
-            .filter(line => line.trim().length > 0)
-            .map(line => line.replace(/^[-*•]\s*/, '').trim()); // remove leading dash/bullet
+Follow this format STRICTLY:
 
-        document.summary = bullets;
+Topic:
+(Identify the exact topic in one line)
+
+Key Concepts:
+- Point 1
+- Point 2
+- Point 3
+
+Simple Explanation:
+(Explain in very easy, beginner-friendly language)
+
+Important Points:
+- Key fact 1
+- Key fact 2
+- Key fact 3
+
+Example:
+(Give a simple real-world or exam-based example)
+
+Flashcards:
+Q1: ...
+A1: ...
+Q2: ...
+A2: ...
+Q3: ...
+A3: ...
+
+Difficulty Level:
+(Easy / Medium / Hard)
+
+Rules:
+- Keep output clean and well-structured
+- Do NOT add extra text outside this format
+- Keep explanation simple and short
+- Flashcards must be clear and useful for revision
+
+Notes:
+${safeText}
+
+RETURN ONLY A VALID JSON OBJECT with the following keys exactly:
+"topic" (string), "keyConcepts" (array of strings), "simpleExplanation" (string), "importantPoints" (array of strings), "example" (string), "flashcards" (array of objects with "question" and "answer" properties), "difficultyLevel" (string). Do not add any markdown formatting, code blocks like \`\`\`json, or explanatory text outside the JSON object.`;
+
+        const chatCompletion = await groq.chat.completions.create({
+            messages: [{ role: 'user', content: prompt }],
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.2,
+            response_format: { type: 'json_object' }
+        });
+
+        const aiText = chatCompletion.choices[0]?.message?.content || "{}";
+        
+        let parsedJson;
+        try {
+            parsedJson = JSON.parse(aiText);
+        } catch(e) {
+            console.error("Failed to parse JSON", aiText);
+            throw new Error("AI returned invalid JSON structure.");
+        }
+
+        document.summary = parsedJson;
         await document.save();
 
-        res.json({ summary: bullets });
+        res.json({ summary: parsedJson });
 
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: error.message });
     }
 };
@@ -84,8 +138,8 @@ exports.askDocument = async (req, res) => {
         const document = await Document.findById(documentId);
         if (!document) return res.status(404).json({ message: "Document not found" });
 
-        if (!process.env.GEMINI_API_KEY) {
-            return res.status(500).json({ message: "AI API Key is missing. Please configure GEMINI_API_KEY." });
+        if (!process.env.GROQ_API_KEY) {
+            return res.status(500).json({ message: "AI API Key is missing. Please configure GROQ_API_KEY." });
         }
 
         if (document.materialType !== "File" || !document.fileUrl) {
@@ -95,17 +149,22 @@ exports.askDocument = async (req, res) => {
         const text = await extractTextFromPDF(document.fileUrl);
         const safeText = text.substring(0, 15000); // Send the first 15k characters for context
 
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-        const prompt = `You are a helpful teaching assistant helping a student understand their study material. Use the provided document text to answer their question accurately. If the answer is not in the text, you can use your general knowledge but mention that it wasn't in the provided document.\n\nDocument Text:\n${safeText}\n\nStudent Question:\n${question}`;
+        const prompt = `You are an expert teaching assistant helping a student thoroughly understand their study material. Use the provided document text as your foundation to answer their question. However, you are highly encouraged to draw upon your broad general knowledge to provide a comprehensive, well-rounded answer that covers slightly wider, related areas of the topic if it helps clarify the concept or provides useful real-world context. Seamlessly blend the document's information with your expanded knowledge without constantly stating things like "this is not in the provided text". \n\nIMPORTANT FORMATTING RULES:\n1. Be concise. Do not generate massive essays for simple questions.\n2. Keep your answer to 2-3 short, highly readable paragraphs unless explicitly asked for more detail.\n3. Use bullet points or numbered lists if you are listing 3 or more items.\n\nDocument Text:\n${safeText}\n\nStudent Question:\n${question}`;
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
+        const chatCompletion = await groq.chat.completions.create({
+            messages: [{ role: 'user', content: prompt }],
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.5
+        });
+
+        const answer = chatCompletion.choices[0]?.message?.content || "Sorry, I could not generate an answer.";
         
-        res.json({ answer: response.text().trim() });
+        res.json({ answer: answer.trim() });
 
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: error.message });
     }
 };
