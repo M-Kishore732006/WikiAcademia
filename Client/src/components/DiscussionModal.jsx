@@ -10,6 +10,26 @@ const getAvatarColor = (name) => {
     return colors[charCode % colors.length];
 };
 
+const RoleBadge = ({ role }) => {
+    if (role === 'faculty') return (
+        <span style={{
+            fontSize: '10px', padding: '2px 8px', borderRadius: '9999px',
+            fontWeight: '700', letterSpacing: '0.04em', whiteSpace: 'nowrap',
+            backgroundColor: 'rgba(6, 182, 212, 0.12)', color: '#22d3ee',
+            border: '1px solid rgba(6, 182, 212, 0.35)'
+        }}>Faculty</span>
+    );
+    if (role === 'admin') return (
+        <span style={{
+            fontSize: '10px', padding: '2px 8px', borderRadius: '9999px',
+            fontWeight: '700', letterSpacing: '0.04em', whiteSpace: 'nowrap',
+            backgroundColor: 'rgba(139, 92, 246, 0.12)', color: '#a78bfa',
+            border: '1px solid rgba(139, 92, 246, 0.35)'
+        }}>Admin</span>
+    );
+    return null;
+};
+
 const DiscussionModal = ({ isOpen, onClose, documentId, title }) => {
     const [comments, setComments] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -251,9 +271,9 @@ const DiscussionModal = ({ isOpen, onClose, documentId, title }) => {
                                         <div className="flex items-center justify-center shrink-0 rounded-full text-white font-bold" style={{ width: '24px', height: '24px', backgroundColor: getAvatarColor(comment.user?.name), fontSize: '11px' }}>
                                             {comment.user?.name?.charAt(0).toUpperCase() || '?'}
                                         </div>
-                                        <span className="text-sm font-bold flex flex-wrap items-center gap-2" style={{ color: 'var(--text-main)' }}>
-                                            {comment.user?.name || 'Unknown User'} 
-                                            {comment.user?.role === 'faculty' && <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0" style={{ backgroundColor: 'rgba(0, 198, 255, 0.1)', color: 'var(--primary)' }}>Faculty</span>}
+                                        <span className="text-sm font-bold flex items-center gap-2" style={{ color: 'var(--text-main)', flexWrap: 'wrap' }}>
+                                            {comment.user?.name || 'Unknown User'}
+                                            <RoleBadge role={comment.user?.role} />
                                         </span>
                                         <span className="text-xs shrink-0" style={{ color: 'var(--text-muted)' }}>•</span>
                                         <span className="text-xs shrink-0" style={{ color: 'var(--text-muted)' }}>{new Date(comment.createdAt).toLocaleDateString()}</span>
@@ -334,20 +354,24 @@ const DiscussionModal = ({ isOpen, onClose, documentId, title }) => {
                                                     {/* Reply Content */}
                                                     <div className="flex-1 min-w-0 pt-1" style={{ backgroundColor: 'transparent' }}>
                                                         <div className="flex justify-between items-center" style={{ marginBottom: '0.25rem' }}>
-                                                            <div className="flex items-center gap-2">
+                                                            <div className="flex items-center gap-2" style={{ flexWrap: 'wrap', minWidth: 0 }}>
                                                                 <div className="flex items-center justify-center shrink-0 rounded-full text-white font-bold" style={{ width: '18px', height: '18px', backgroundColor: getAvatarColor(reply.user?.name), fontSize: '9px' }}>
                                                                     {reply.user?.name?.charAt(0).toUpperCase() || '?'}
                                                                 </div>
-                                                                <span className="text-xs font-bold flex flex-wrap items-center gap-1" style={{ color: 'var(--text-main)' }}>
+                                                                <span className="text-xs font-bold flex items-center gap-2" style={{ color: 'var(--text-main)', flexWrap: 'wrap' }}>
                                                                     {reply.user?.name || 'Unknown'}
-                                                                    {reply.user?.role === 'faculty' && <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold" style={{ marginLeft: '0.25rem', backgroundColor: 'rgba(0, 198, 255, 0.1)', color: 'var(--primary)' }}>Faculty</span>}
+                                                                    <RoleBadge role={reply.user?.role} />
                                                                 </span>
+                                                                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>•</span>
+                                                                <span style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{new Date(reply.createdAt).toLocaleDateString()}</span>
                                                             </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{new Date(reply.createdAt).toLocaleDateString()}</span>
+                                                            <div className="flex items-center" style={{ flexShrink: 0 }}>
                                                                 {canDelete(reply) && (
-                                                                    <button onClick={() => handleDelete(reply._id, true, comment._id)} className="text-[10px] font-semibold cursor-pointer hover:underline" style={{ background: 'transparent', border: 'none', padding: 0, color: 'var(--error)' }}>
-                                                                        Delete
+                                                                    <button
+                                                                        onClick={() => handleDelete(reply._id, true, comment._id)}
+                                                                        className="btn-delete-reply"
+                                                                    >
+                                                                        <Trash2 size={11} /> Delete
                                                                     </button>
                                                                 )}
                                                             </div>

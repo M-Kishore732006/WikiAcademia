@@ -1,4 +1,4 @@
-# WikiAcademia (Digital Academic Repository)
+# WikiAcademia
 
 A comprehensive full-stack web application designed for academic institutions to manage, share, and browse educational resources efficiently. This platform allows faculty members to upload study materials (PDFs, PPTXs) and enables students to access them easily.
 

@@ -149,11 +149,14 @@ exports.resetPassword = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // RBAC logic
-    if (caller.role !== "admin") {
-      if (caller.role === "faculty" && targetUser.role !== "student") {
-         return res.status(403).json({ message: "Faculty can only reset student passwords" });
-      }
+    // Prevent any admin from resetting another admin's password
+    if (targetUser.role === "admin" && caller._id.toString() !== targetUserId) {
+      return res.status(403).json({ message: "Cannot reset another admin's password" });
+    }
+
+    // Faculty can only reset student passwords
+    if (caller.role === "faculty" && targetUser.role !== "student") {
+      return res.status(403).json({ message: "Faculty can only reset student passwords" });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -180,10 +183,16 @@ exports.getUsers = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const targetUserId = req.params.id;
+    const caller = req.user;
     const user = await User.findById(targetUserId);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+
+    // Prevent admins from deleting other admins
+    if (user.role === "admin" && caller._id.toString() !== targetUserId) {
+      return res.status(403).json({ message: "Cannot delete another admin account" });
     }
 
     await User.findByIdAndDelete(targetUserId);

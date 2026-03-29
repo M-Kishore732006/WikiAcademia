@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useContext } from 'react';
 import api from '../utils/api';
 import './ManageUsers.css'; // Mapped vanilla CSS file
 import { 
@@ -7,8 +7,10 @@ import {
     UserPlus, Shield, Copy, CheckCircle, Eye, EyeOff
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import AuthContext from '../context/AuthContext';
 
 const ManageUsers = () => {
+    const { user: currentUser } = useContext(AuthContext);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -404,7 +406,9 @@ const ManageUsers = () => {
                                                 <button 
                                                     onClick={() => handleResetPassword(u)}
                                                     className="reset"
-                                                    title="Force Password Reset"
+                                                    title={u.role === 'admin' && u._id !== currentUser?._id ? "Cannot reset another Admin's password" : "Force Password Reset"}
+                                                    disabled={u.role === 'admin' && u._id !== currentUser?._id}
+                                                    style={{ opacity: (u.role === 'admin' && u._id !== currentUser?._id) ? 0.3 : 1, cursor: (u.role === 'admin' && u._id !== currentUser?._id) ? 'not-allowed' : 'pointer' }}
                                                 >
                                                     <KeyRound size={18} />
                                                 </button>
@@ -458,8 +462,12 @@ const ManageUsers = () => {
                                             ><Edit2 size={16} /></button>
                                             <button 
                                                 onClick={() => handleResetPassword(u)}
-                                                style={{ background: 'rgba(245,158,11,0.1)', color:'#f59e0b', border:'none', borderRadius:'0.4rem', padding:'0.4rem', cursor:'pointer', display:'flex', alignItems:'center' }}
-                                                title="Reset Password"
+                                                style={{ background: 'rgba(245,158,11,0.1)', color:'#f59e0b', border:'none', borderRadius:'0.4rem', padding:'0.4rem', display:'flex', alignItems:'center',
+                                                    opacity: (u.role === 'admin' && u._id !== currentUser?._id) ? 0.3 : 1,
+                                                    cursor: (u.role === 'admin' && u._id !== currentUser?._id) ? 'not-allowed' : 'pointer'
+                                                }}
+                                                title={u.role === 'admin' && u._id !== currentUser?._id ? "Cannot reset another Admin's password" : "Reset Password"}
+                                                disabled={u.role === 'admin' && u._id !== currentUser?._id}
                                             ><KeyRound size={16} /></button>
                                             <button 
                                                 onClick={() => { setSelectedUser(u); setIsDeleteModalOpen(true); }}
