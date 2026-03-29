@@ -13,3 +13,5 @@ build/
 
 # Logs
 npm-debug.log*
+#access logs
+Server/access.log
