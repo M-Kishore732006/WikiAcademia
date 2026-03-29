@@ -23,7 +23,7 @@ WikiAcademia is an AI-powered collaborative learning platform designed to transf
 To explore the platform, you can use the following sample accounts:
 
 ### 👨‍🎓 Student Login
-- **Email**: teststudent@gmail  
+- **Email**: teststudent@gmail.com
 - **Password**: teststudent
 - **note**: All self-registered accounts are created as Students.
 
