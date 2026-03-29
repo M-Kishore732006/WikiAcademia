@@ -1,6 +1,6 @@
 # WikiAcademia
 
-WikiAcademia is an AI-powered collaborative learning platform designed to transform unstructured lecture materials into structured, interactive knowledge while enabling meaningful peer-to-peer learning..
+WikiAcademia is an AI-powered collaborative learning platform designed to transform unstructured lecture materials into structured, interactive knowledge while enabling meaningful peer-to-peer learning.
 
 ## 🚀 Key Features
 
@@ -13,7 +13,7 @@ WikiAcademia is an AI-powered collaborative learning platform designed to transf
 - **Full-Stack Deployment**: Built using React (Vercel), Node.js & Express (Render), and MongoDB Atlas.  
 - **Responsive UI/UX**: Clean and user-friendly interface designed for seamless navigation and interaction.
     
-## 🚀 Project Demo
+## 🎦 Project Demo
 
 🎥 Watch the full demo here:  
 👉 https://www.youtube.com/watch?v=5lLhAdehWMU
@@ -25,15 +25,15 @@ To explore the platform, you can use the following sample accounts:
 ### 👨‍🎓 Student Login
 - **Email**: teststudent@gmail  
 - **Password**: teststudent
--**note**: All self-registered accounts are created as Students.
+- **note**: All self-registered accounts are created as Students.
 
 ### 👨‍🏫 Faculty Login
 - **Email**: test@example.com
 - **Password**: 123456
 
-###   Admin Login
--**Email**: viceadmin@gmail.com
--**password**: IIITDM
+### 🏫 Admin Login
+- **Email**: viceadmin@gmail.com
+- **password**: IIITDM
 
 ## 🌐 Live Demo
 
@@ -59,7 +59,7 @@ To explore the platform, you can use the following sample accounts:
 - **Multer**: Middleware for handling `multipart/form-data` (file uploads).
 - **JWT & BcryptJS**: For secure authentication and password hashing.
 - **Helmet & Morgan**: Security and logging middlewares.
-
+- **Groq API (LLaMA 3.1)**: High-performance AI inference 
 ## 📂 Project Structure
 
 ```text
