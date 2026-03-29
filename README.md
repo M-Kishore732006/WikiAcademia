@@ -11,6 +11,11 @@ A comprehensive full-stack web application designed for academic institutions to
 - **User Management**: Admin-level control to manage user roles and permissions.
 - **Responsive Design**: Fully responsive UI/UX built with React and Tailwind CSS.
 
+## 🚀 Project Demo
+
+🎥 Watch the full demo here:  
+👉 https://www.youtube.com/watch?v=5lLhAdehWMU
+
 ## 🛠️ Tech Stack
 
 ### Frontend
